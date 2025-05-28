@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from '../../auth/context/AuthContext'; // Updated path for AuthContext
 import { ROLES } from '../../config/roles'; // Updated path for ROLES
-import "../../styles/Sidebar.css"; // Updated path for Sidebar.css
 
 const Sidebar = () => {
   const { user, logout, isAdmin, isManager, isTeamLeader } = useAuth();

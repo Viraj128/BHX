@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs, doc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../../../firebase/config'; // Updated path
+import { db } from '../../firebase/config'; // Updated path
 import { useNavigate } from 'react-router-dom';
 
 const InventoryRecords = () => {

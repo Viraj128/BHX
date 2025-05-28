@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../../../firebase/config"; // Updated path
+import { db } from "../../firebase/config"; // Updated path
 import { collection, getDocs } from "firebase/firestore";
 import { Link } from "react-router-dom";
 

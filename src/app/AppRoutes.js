@@ -46,20 +46,20 @@
 
 //src/app/AppRoutes.js
 import { Routes, Route } from "react-router-dom";
-import { ProtectedRoute } from '../../auth/components/ProtectedRoute'; // Go up twice, then into auth/components
-import Login from '../../auth/pages/Login'; // Go up twice, then into auth/pages
-import Unauthorized from '../../Unauthorized'; // Assuming in src root
-import AdminLayout from '../../common/layouts/AdminLayout';
-import ManagerLayout from '../../common/layouts/ManagerLayout';
-import TeamLeaderLayout from '../../common/layouts/TeamLeaderLayout';
-import TeamMemberLayout from '../../common/layouts/TeamMemberLayout';
-import { ROLES } from '../../config/roles'; // Go up twice, then into config
+import { ProtectedRoute } from '../auth/components/ProtectedRoute'; 
+import Login from '../auth/pages/Login'; 
+// import Unauthorized from '../../Unauthorized'; 
+import AdminLayout from '../common/layouts/AdminLayout';
+import ManagerLayout from '../common/layouts/ManagerLayout';
+import TeamLeaderLayout from '../common/layouts/TeamLeaderLayout';
+import TeamMemberLayout from '../common/layouts/TeamMemberLayout';
+import { ROLES } from '../config/roles'; 
 
 const AppRoutes = () => {
     return (
         <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
+            {/* <Route path="/unauthorized" element={<Unauthorized />} /> */}
 
             <Route path="/admin/*" element={
                 <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
@@ -90,6 +90,5 @@ const AppRoutes = () => {
 
 export default AppRoutes;
 
-src/app/AppRoutes.js
 
 

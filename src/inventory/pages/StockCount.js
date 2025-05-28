@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { db } from "../../../firebase/config"; // Updated path
+import { db } from "../../firebase/config"; // Updated path
 import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
-import InventoryManagement from './InventoryManagement'; // Updated path
+import InventoryManagement from './InventoryRecords'; // Updated path
 
 const StockCount = () => {
   const [inventoryItems, setInventoryItems] = useState([]);

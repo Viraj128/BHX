@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../../firebase/config'; // Updated path
+import { db } from '../../firebase/config'; // Updated path
 import {
   collection,
   getDocs,
