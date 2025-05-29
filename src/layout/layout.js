@@ -12,11 +12,14 @@ const Layout = () => {
   }
 
   return (
-    <div className="flex min-h-screen">
+  <div className="flex min-h-screen">
+      {/* Sidebar is fixed and takes up 256px width */}
       <Sidebar user={user} />
-      <main className="flex-1 bg-gray-100">
+
+      {/* Main content area with padding to avoid overlapping the fixed sidebar */}
+      <div className="flex-1 pl-64">
         <Outlet />
-      </main>
+      </div>
     </div>
   );
 };

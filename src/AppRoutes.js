@@ -5,9 +5,9 @@ import Dashboard from './pages/Dashboard';
 import Unauthorized from './Unauthorized';
 import { ROLES } from './config/roles';
 import Layout from '../src/layout/layout';
-// import Users from '../src/pages/Users';
+import Users from '../src/pages/Users';
 // import Attendance from '../src/pages/Attendance';
-// import UserDetails from '../src/pages/UserDetails';
+import UserDetails from '../src/pages/UserDetails';
 // import StockCount from './pages/inventory/StockCount';
 // import WasteManagement from '../src/pages/inventory/WasteManagement';
 // import InventoryAndWasteHistory from '../src/pages/inventory/StockMovement';
@@ -33,13 +33,13 @@ function AppRoutes() {
       </Route>
 
       {/* Admin and Manager only routes */}
-      {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER]} />}>
+      <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER , ROLES.TEAMLEADER]} />}>
         <Route element={<Layout />}>
           <Route path="/users" element={<Users />} />
           <Route path="/users/:userId" element={<UserDetails />} />
-          <Route path="/users/add-employee" element={<AddUser />} />
+          {/* <Route path="/users/add-employee" element={<AddUser />} /> */}
         </Route>
-      </Route> */}
+      </Route>
 
       {/* Inventory routes for Admin, Manager, and Team Leader */}
       {/* <Route element={<ProtectedRoute allowedRoles={[

@@ -12,7 +12,6 @@ const Sidebar = ({ user }) => {
   const [isItemsManagementOpen, setIsItemsManagementOpen] = useState(false);
   const [isCustomerTrackingOpen, setIsCustomerTrackingOpen] = useState(false);
   
-  // Separate role checks for better readability
   const isAdmin = user?.role === ROLES.ADMIN;
   const isManager = user?.role === ROLES.MANAGER;
   const isTeamLeader = user?.role === ROLES.TEAMLEADER;
@@ -34,7 +33,7 @@ const Sidebar = ({ user }) => {
   };
 
   return (
-    <div className="w-64 bg-white min-h-screen p-4 flex flex-col border-r border-gray-200">
+    <div className="w-64 bg-white h-[100vh] p-4 flex flex-col border-r border-gray-200 fixed top-0 left-0">
       {/* Brand Header */}
       <div className="text-gray-800 mb-6">
         <h1 className="text-xl font-bold mb-1">BHX - Bhookie</h1>
