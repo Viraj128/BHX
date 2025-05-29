@@ -1,0 +1,100 @@
+users_01 (Collection)
+└── {phone numer} (Document)
+    ├── address: string
+    ├── bank_details (map)
+    │   ├── account_number: string
+    │   ├── bank_name: string
+    │   ├── branch_name: string
+    │   ├── ifsc_code: string
+    ├── dob: string
+    ├── document_number: string
+    ├── email: string
+    ├── employeeID: string
+   ├── userId: string
+    ├── member_since: string
+    ├── name: string
+    ├── otp: string
+    ├── phone: string
+    ├── role: string
+    ├── shareCode: string
+
+customers (Collection)
+└── {phone number} (Document)
+    ├── address: string
+    ├── bank_details (map)
+    │   ├── account_number: string
+    │   ├── bank_name: string
+    │   ├── branch_name: string
+    │   ├── ifsc_code: string
+    ├── userId: string
+    ├── dob: string
+    ├── document_number: string
+    ├── email: string
+    ├── customerID: string
+    ├── member_since: string
+    ├── name: string
+    ├── otp: string
+    ├── phone: string
+    ├── role: string
+    ├── shareCode: string
+
+
+attendance
+  └── 2025-05-05 (Date of the attendance record)
+      └── sessions
+          └── oyQHTwCOEdYCIMJgWEOO (Session ID)
+              ├── checkIn: timestamp 
+              ├── checkOut: timestamp 
+              ├── role: "employee" (string)
+              ├── source: "admin" (string) | system | manager
+              ├── status: "closed" (string)
+              └── user: /users_01/Nq4WTjcfIZ62W4prIQC8 
+
+for main database
+attendance
+  └── 2025-05-05 (Date of the attendance record)
+      └── sessions
+          └── oyQHTwCOEdYCIMJgWEOO (Session ID)
+              ├── checkIn: timestamp (May 5, 2025 at 5:02:05 PM UTC+5:30)
+              ├── checkInEdited: true (boolean)
+              ├── checkOut: timestamp (May 5, 2025 at 11:02:05 PM UTC+5:30)
+              ├── checkOutEdited: true (boolean)
+              ├── editedAt: timestamp (May 6, 2025 at 2:13:13 AM UTC+5:30)
+              ├── editedBy: "Admin" (string)
+              ├── role: "employee" (string)
+              ├── source: "admin" (string)
+              ├── status: "closed" (string)
+              └── user: /users_01/Nq4WTjcfIZ62W4prIQC8 (Reference to user document)
+
+
+
+floats (Collection)
+└── floatA_2025-05-02 (Document)
+    ├── authorisedBy (map)
+    │   ├── cashier: string
+    │   ├── witness: string
+    │   ├── cashierId: string
+    ├── closed: boolean
+    ├── date: string
+    ├── entries (array of maps)
+    │   ├── [0]
+    │   │   ├── count: number
+    │   │   ├── denomination: string
+    │   │   ├── value: number
+    │   ├── ...
+    │   ├── [11]
+    │   │   ├── count: number
+    │   │   ├── denomination: string
+    │   │   ├── value: number
+    ├── initialCount: number
+    ├── isOpen: boolean
+    ├── openedAt: timestamp
+    ├── total: number
+    ├── type: string
+    ├── variance: number
+
+    └── cashierSessions (Subcollection)
+        └── 10096_1746216891658 (Document)
+            ├── EmployeeId: string
+            ├── closedAt: timestamp
+            ├── openedAt: timestamp
