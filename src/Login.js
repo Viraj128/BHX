@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../src/firebase/config";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { useAuth } from "../src/context/AuthContext";
+import { useAuth } from "./auth/AuthContext";
 import { getDashboardPath } from "../src/config/roles";
-
 
 const Login = () => {
   const navigate = useNavigate();
@@ -41,8 +40,11 @@ const Login = () => {
       if (!userData.role) {
         throw new Error("User role not defined");
       }
+      if (!userData.employeeID) {
+        throw new Error("Employee ID not defined");
+      }
 
-      setUserData({ ...userData, id: userDoc.id });
+      setUserData({ ...userData, employeeID: userData.employeeID });
       setStep("otp");
     } catch (err) {
       setError(err.message);
@@ -64,7 +66,7 @@ const Login = () => {
     try {
       if (otp === userData.otp.toString()) {
         await login(userData);
-        navigate(getDashboardPath());
+        navigate(getDashboardPath(), { replace: true });
       } else {
         throw new Error("Invalid OTP");
       }
