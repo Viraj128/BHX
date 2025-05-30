@@ -11,7 +11,8 @@ import UserDetails from '../src/pages/UserDetails';
 // import StockCount from './pages/inventory/StockCount';
 // import WasteManagement from '../src/pages/inventory/WasteManagement';
 // import InventoryAndWasteHistory from '../src/pages/inventory/StockMovement';
-// import AddUser from "../src/pages/AddUser";
+import AddUser from "../src/pages/admin/AddUser";
+import ChangePhoneNumber from "../src/pages/admin/phoneNumberChange"
 
 function AppRoutes() {
   return (
@@ -37,7 +38,8 @@ function AppRoutes() {
         <Route element={<Layout />}>
           <Route path="/users" element={<Users />} />
           <Route path="/users/:userId" element={<UserDetails />} />
-          {/* <Route path="/users/add-employee" element={<AddUser />} /> */}
+          <Route path="/users/add-employee" element={<AddUser />} />
+           <Route path="/users/changephoneNumber" element={<ChangePhoneNumber />} />
         </Route>
       </Route>
 

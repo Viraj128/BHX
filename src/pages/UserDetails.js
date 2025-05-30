@@ -228,7 +228,7 @@ const UserDetails = () => {
     const handlePhoneChangeAlertConfirm = () => {
         setIsPhoneChangeAlertOpen(false);
         setIsEditOpen(false);
-        navigate('/admin/user/changephoneNumber', { state: { oldPhone: user.phone } });
+        navigate('/users/changephoneNumber', { state: { oldPhone: user.phone } });
     };
 
     const formatShareCode = (value) => {
@@ -592,7 +592,7 @@ const UserDetails = () => {
                         <label className="block text-sm font-medium text-gray-700">Document Number</label>
                         <div className="mt-1">
                             <ChangeAwareDisplay field="document_number" value={user.document_number} changes={user?.changeField || []} />
-                            Emberson</div>
+                    </div>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Member Since</label>
