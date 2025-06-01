@@ -23,8 +23,12 @@ const InventoryRecords = () => {
           itemId: doc.data().itemId || '',
         }));
         items.sort((a, b) => {
-          const idA = parseInt(a.itemId.match(/^item0*(\d+)$/)[1]) || 0;
-          const idB = parseInt(b.itemId.match(/^item0*(\d+)$/)[1]) || 0;
+          const idA = a.itemId && typeof a.itemId === 'string' && a.itemId.match(/^item0*(\d+)$/)
+            ? parseInt(a.itemId.match(/^item0*(\d+)$/)[1])
+            : 0;
+          const idB = b.itemId && typeof b.itemId === 'string' && b.itemId.match(/^item0*(\d+)$/)
+            ? parseInt(b.itemId.match(/^item0*(\d+)$/)[1])
+            : 0;
           return idA - idB;
         });
         setInventory(items);
@@ -43,8 +47,12 @@ const InventoryRecords = () => {
         let aValue = a[key] || '';
         let bValue = b[key] || '';
         if (key === 'itemId') {
-          aValue = parseInt(aValue.match(/^item0*(\d+)$/)[1]) || 0;
-          bValue = parseInt(bValue.match(/^item0*(\d+)$/)[1]) || 0;
+          aValue = aValue && typeof aValue === 'string' && aValue.match(/^item0*(\d+)$/)
+            ? parseInt(aValue.match(/^item0*(\d+)$/)[1])
+            : 0;
+          bValue = bValue && typeof bValue === 'string' && bValue.match(/^item0*(\d+)$/)
+            ? parseInt(bValue.match(/^item0*(\d+)$/)[1])
+            : 0;
         } else if (['unitsPerInner', 'innerPerBox', 'totalStockOnHand'].includes(key)) {
           aValue = Number(aValue) || 0;
           bValue = Number(bValue) || 0;
@@ -179,7 +187,7 @@ const InventoryRecords = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex-1 text-left pl-10">
           <button
-            onClick={() => navigate('/admin/inventory/addinventory')}
+            onClick={() => navigate('/inventory/addinventory')}
             className="bg-green-600 text-white font-bold px-6 py-2 rounded hover:bg-green-700 text-sm"
             style={{ height: '42px', width: '150px' }}
           >
