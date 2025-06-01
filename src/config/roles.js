@@ -16,6 +16,7 @@ export const PATHS = {
   MEMBERATTENDANCE: '/memberattendance',
   STOCK_COUNT: '/inventory/stock-count',
   WASTE_MANAGEMENT: '/inventory/waste-management',
+  INVENTORY_RECORDS: '/inventory/inventoryrecords',
   STOCK_MOVEMENT: '/inventory/stock-movement',
   VIEWDETAILS: '/viewDetails',
 };

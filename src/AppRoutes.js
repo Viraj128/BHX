@@ -8,14 +8,14 @@ import Layout from '../src/layout/layout';
 import Users from '../src/pages/Users';
 import Attendance from '../src/pages/Attendance';
 import UserDetails from '../src/pages/UserDetails';
-// import StockCount from './pages/inventory/StockCount';
-// import WasteManagement from '../src/pages/inventory/WasteManagement';
-// import InventoryAndWasteHistory from '../src/pages/inventory/StockMovement';
+import StockCount from './pages/inventory/StockCount';
+import WasteManagement from '../src/pages/inventory/WasteManagement';
+import InventoryAndWasteHistory from '../src/pages/inventory/StockMovement';
 import AddUser from "../src/pages/admin/AddUser";
 import ChangePhoneNumber from "../src/pages/admin/phoneNumberChange"
 import ViewDetails from "./pages/teammember/ViewDetails";
 import MemberAttendance from "../src/pages/teammember/MemberAttendance";
-
+import InventoryRecords from "./pages/inventory/inventoryrecords";
 function AppRoutes() {
   return (
     <Routes>
@@ -54,7 +54,7 @@ function AppRoutes() {
       </Route>
 
       {/* Inventory routes for Admin, Manager, and Team Leader */}
-      {/* <Route element={<ProtectedRoute allowedRoles={[
+       <Route element={<ProtectedRoute allowedRoles={[
         ROLES.ADMIN, 
         ROLES.MANAGER, 
         ROLES.TEAMLEADER
@@ -63,8 +63,9 @@ function AppRoutes() {
           <Route path="/inventory/stock-count" element={<StockCount />} />
           <Route path="/inventory/waste-management" element={<WasteManagement />} />
           <Route path="/inventory/stock-movement" element={<InventoryAndWasteHistory />} />
+          <Route path="/inventory/inventoryrecords" element={<InventoryRecords/>} />
         </Route>
-      </Route> */}
+      </Route> 
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -53,6 +53,11 @@ export const NAV_ITEMS = [
         label: 'Stock Movement',
         path: PATHS.STOCK_MOVEMENT,
         roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
+      },{
+        // Sub-navigation for Stock Movement
+        label: 'Inventory Records',
+        path: PATHS.INVENTORY_RECORDS,
+        roles: [ROLES.ADMIN]
       }
     ],
     // Only show the Inventory section for these roles
