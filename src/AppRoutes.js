@@ -16,6 +16,8 @@ import ChangePhoneNumber from "../src/pages/admin/phoneNumberChange"
 import ViewDetails from "./pages/teammember/ViewDetails";
 import MemberAttendance from "../src/pages/teammember/MemberAttendance";
 import InventoryRecords from "./pages/inventory/inventoryrecords";
+import AddInventory from './pages/inventory/Addinventory';
+
 function AppRoutes() {
   return (
     <Routes>
@@ -64,6 +66,7 @@ function AppRoutes() {
           <Route path="/inventory/waste-management" element={<WasteManagement />} />
           <Route path="/inventory/stock-movement" element={<InventoryAndWasteHistory />} />
           <Route path="/inventory/inventoryrecords" element={<InventoryRecords/>} />
+          <Route path="/inventory/addinventory" element={<AddInventory/>} />
         </Route>
       </Route> 
 
