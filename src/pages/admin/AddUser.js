@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { collection, addDoc, doc, getDoc, setDoc, query, where, getDocs } from "firebase/firestore";
 import { Timestamp } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const initialState = {
   name: "",
@@ -28,7 +30,15 @@ const initialState = {
 const AddUser = () => {
   const [formData, setFormData] = useState(initialState);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Simulate page loading
+  useEffect(() => {
+    const timer = setTimeout(() => setPageLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const showError = (message) => {
     setError(message);
@@ -46,17 +56,12 @@ const AddUser = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "shareCode") {
-      // Remove non-digits and limit to 6 digits
       let digits = value.replace(/[^\d]/g, "").slice(0, 6);
-      // Format as __/__/__ (e.g., 123456 -> 12/34/56)
       let formatted = "";
       if (digits.length > 0) formatted = digits.slice(0, 2);
       if (digits.length > 2) formatted += "/" + digits.slice(2, 4);
       if (digits.length > 4) formatted += "/" + digits.slice(4, 6);
-      setFormData((prev) => ({
-        ...prev,
-        shareCode: formatted,
-      }));
+      setFormData((prev) => ({ ...prev, shareCode: formatted }));
     } else if (name.startsWith("bank_")) {
       const field = name.replace("bank_", "");
       setFormData((prev) => ({
@@ -84,11 +89,13 @@ const AddUser = () => {
     if (birthYear > 2001) return showError("Date of Birth should be 2001 or earlier."), false;
     if (!/^[A-Za-z\s]+$/.test(formData.bank_details.bank_name))
       return showError("Bank name should only contain alphabets."), false;
+    if (!/^[A-Za-z\s]+$/.test(formData.bank_details.branch_name))
+      return showError("Branch name should only contain alphabets."), false;
     if (!/^\d{8}$/.test(formData.bank_details.account_number))
       return showError("Bank account number must be exactly 8 digits."), false;
     if (!/^\d{5}$/.test(formData.document_number))
       return showError("Document number must be exactly 5 digits."), false;
-    // Updated validation: shareCode must be exactly 6 digits (ignoring slashes)
+    
     const shareCodeDigits = formData.shareCode.replace(/[^\d]/g, "");
     if (formData.shareCode && !/^\d{6}$/.test(shareCodeDigits))
       return showError("Share code must be exactly 6 digits."), false;
@@ -108,40 +115,41 @@ const AddUser = () => {
   const generateEmployeeID = () => Math.floor(10000 + Math.random() * 90000).toString();
 
   const generateUniqueUserId = async () => {
-    let isUnique = false;
-    let userId;
-    while (!isUnique) {
+    let userId = "";
+    for (let i = 0; i < 5; i++) {
       userId = Math.floor(100000000 + Math.random() * 900000000).toString();
-      const usersQuery = query(collection(db, "users_01"), where("userId", "==", userId));
-      const customersQuery = query(collection(db, "customers"), where("userId", "==", userId));
-
-      try {
-        const [usersSnapshot, customersSnapshot] = await Promise.all([
-          getDocs(usersQuery),
-          getDocs(customersQuery),
-        ]);
-        if (usersSnapshot.empty && customersSnapshot.empty) {
-          isUnique = true;
-        }
-      } catch (err) {
-        console.error("Error checking unique user ID:", err);
-        throw new Error("Failed to verify unique user ID. Please try again.");
+      const usersRef = doc(db, "users_01", userId);
+      const customersRef = doc(db, "customers", userId);
+      
+      const [userDoc, customerDoc] = await Promise.all([
+        getDoc(usersRef),
+        getDoc(customersRef)
+      ]);
+      
+      if (!userDoc.exists() && !customerDoc.exists()) {
+        return userId;
       }
     }
-    return userId;
+    throw new Error("Could not generate unique ID after 5 attempts");
   };
 
   const checkForDuplicates = async (docId) => {
     try {
-      const usersDoc = await getDoc(doc(db, "users_01", docId));
-      const customersDoc = await getDoc(doc(db, "customers", docId));
+      const [usersDoc, customersDoc] = await Promise.all([
+        getDoc(doc(db, "users_01", docId)),
+        getDoc(doc(db, "customers", docId))
+      ]);
+      
       if (usersDoc.exists() || customersDoc.exists()) {
         showError("A user with this phone number already exists.");
         return true;
       }
 
       if (formData.email) {
-        const emailQuery = query(collection(db, "users_01"), where("email", "==", formData.email));
+        const emailQuery = query(
+          collection(db, "users_01"), 
+          where("email", "==", formData.email)
+        );
         const emailSnapshot = await getDocs(emailQuery);
         if (!emailSnapshot.empty) {
           showError("A user with this email already exists.");
@@ -196,19 +204,19 @@ const AddUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     showError("");
-
     if (!validateForm()) return;
+    
+    setLoading(true);
     const docId = formData.phone;
 
-    if (await checkForDuplicates(docId)) return;
-
     try {
+      if (await checkForDuplicates(docId)) {
+        setLoading(false);
+        return;
+      }
+
       const auth = getAuth();
-
-      //step 1:Create user in firebase Auth
-      const userCredentials = await createUserWithEmailAndPassword(auth, formData.email, formData.phone); // using phone as password for simplicity
-
-      // step 2:send verfication email
+      const userCredentials = await createUserWithEmailAndPassword(auth, formData.email, formData.phone);
       await sendEmailVerification(userCredentials.user);
 
       const userId = await generateUniqueUserId();
@@ -233,7 +241,7 @@ const AddUser = () => {
           : { employeeID: formData.employeeID }
         ),
         ...(formData.role !== "customer" && { active: true }),
-        emailVerified: false, // Track verification status
+        emailVerified: false,
       };
 
       if (formData.role === "customer") {
@@ -242,23 +250,44 @@ const AddUser = () => {
         await setDoc(doc(db, "users_01", docId), userData);
       }
 
-      alert("User added successfully!.Verification email sent!");
+      alert("User added successfully! Verification email sent!");
       setFormData(initialState);
-
       navigate("/users");
     } catch (err) {
       console.error("Error adding user:", err);
-
       if (err.code === "auth/email-already-in-use") {
         showError("This email is already in use. Please use a different email");
       } else {
-        showError("Error adding user. Please try again.");
+        showError("Error adding user: " + err.message);
       }
+    } finally {
+      setLoading(false);
     }
   }
 
+  // Skeleton loading for entire page
+  if (pageLoading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+        <Skeleton height={40} width={150} className="mb-6" />
+        <h2 className="text-3xl font-bold text-gray-800 mb-6"><Skeleton width={200} /></h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i}>
+              <Skeleton height={20} width={100} className="mb-1" />
+              <Skeleton height={40} />
+            </div>
+          ))}
+        </div>
+        <div className="mt-8">
+          <Skeleton height={45} width={120} />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="max-w-4xl mx-auto mt-20 p-6 bg-white rounded-lg shadow-md">
       <button
         className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors mb-6"
         onClick={() => navigate("/users")}
@@ -271,6 +300,7 @@ const AddUser = () => {
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Full Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
             <input
@@ -283,6 +313,7 @@ const AddUser = () => {
             />
           </div>
 
+          {/* Phone */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
             <div className="flex">
@@ -293,7 +324,6 @@ const AddUser = () => {
                 className="w-1/4 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="+44">+44 (UK)</option>
-                <option value="+91">+91 (India)</option>
               </select>
               <input
                 type="tel"
@@ -307,6 +337,7 @@ const AddUser = () => {
             </div>
           </div>
 
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
@@ -319,6 +350,7 @@ const AddUser = () => {
             />
           </div>
 
+          {/* Date of Birth */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
             <input
@@ -331,6 +363,7 @@ const AddUser = () => {
             />
           </div>
 
+          {/* Customer/Employee ID */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {formData.role === "customer" ? "Customer ID" : "Employee ID"}
@@ -351,13 +384,14 @@ const AddUser = () => {
                     ? setFormData((prev) => ({ ...prev, customerID: generateCustomerID() }))
                     : setFormData((prev) => ({ ...prev, employeeID: generateEmployeeID() }))
                 }
-                className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 transition-colors whitespace-nowrap"
               >
-                Auto-Generate
+                Generate
               </button>
             </div>
           </div>
 
+          {/* Address */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
             <input
@@ -369,6 +403,7 @@ const AddUser = () => {
             />
           </div>
 
+          {/* Role */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
             <select 
@@ -385,6 +420,7 @@ const AddUser = () => {
             </select>
           </div>
 
+          {/* Bank Account Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Bank Account Number</label>
             <input
@@ -397,6 +433,7 @@ const AddUser = () => {
             />
           </div>
 
+          {/* Bank Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
             <input
@@ -409,6 +446,7 @@ const AddUser = () => {
             />
           </div>
 
+          {/* Branch Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
             <input
@@ -421,6 +459,7 @@ const AddUser = () => {
             />
           </div>
 
+          {/* Document Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Document Number</label>
             <input
@@ -433,6 +472,7 @@ const AddUser = () => {
             />
           </div>
 
+          {/* Share Code */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Share Code</label>
             <input
@@ -450,9 +490,20 @@ const AddUser = () => {
         <div className="mt-8">
           <button 
             type="submit"
-            className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            disabled={loading}
+            className={`w-full md:w-auto px-6 py-3 text-white rounded-md transition-colors flex items-center justify-center ${
+              loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            Add User
+            {loading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Adding User...
+              </>
+            ) : "Add User"}
           </button>
         </div>
       </form>

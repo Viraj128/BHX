@@ -1,30 +1,36 @@
+
+
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
-import { useEffect, useCallback } from 'react';
+import { useAuth } from './AuthContext';
+import { useEffect } from 'react';
 
 export const ProtectedRoute = ({ allowedRoles }) => {
-  const { user, resetSessionTimeout } = useAuth();
-
-  const storedUser = localStorage.getItem('user');
-  const sessionTimestamp = localStorage.getItem('sessionTimestamp');
-  const SESSION_TIMEOUT = 20 * 60 * 1000;
-
-  const isSessionValid = useCallback(() => {
-    if (!storedUser || !sessionTimestamp) return false;
-    const timeElapsed = Date.now() - parseInt(sessionTimestamp);
-    return timeElapsed < SESSION_TIMEOUT;
-  }, [storedUser, sessionTimestamp, SESSION_TIMEOUT]);
-
+  const { user, initializing, resetSessionTimeout } = useAuth();
+  
+  // This useEffect must be at the top level
   useEffect(() => {
-    if (user && isSessionValid()) {
+    if (user && !initializing) {
       resetSessionTimeout();
     }
-  }, [user, resetSessionTimeout, isSessionValid]);
+  }, [user, initializing, resetSessionTimeout]);
 
-  if (!user || !storedUser || !isSessionValid()) {
-    localStorage.removeItem('user');
-    localStorage.removeItem('sessionTimestamp');
-    return <Navigate to="/login" replace state={{ from: window.location.pathname }} />;
+  // Check session validity function
+  const isSessionValid = () => {
+    const sessionTimestamp = localStorage.getItem('sessionTimestamp');
+    if (!sessionTimestamp) return false;
+    
+    const SESSION_TIMEOUT = 20 * 60 * 1000; // 20 minutes
+    const timeElapsed = Date.now() - parseInt(sessionTimestamp);
+    return timeElapsed < SESSION_TIMEOUT;
+  };
+
+  // Wait until initialization completes
+  if (initializing) {
+    return null; // Or a loading spinner
+  }
+
+  if (!user || !isSessionValid()) {
+    return <Navigate to="/login" replace />;
   }
 
   if (!allowedRoles.includes(user.role)) {

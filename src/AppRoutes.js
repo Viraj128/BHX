@@ -6,30 +6,32 @@ import Unauthorized from './Unauthorized';
 import { ROLES } from './config/roles';
 import Layout from '../src/layout/layout';
 import Users from '../src/pages/Users';
-// import Attendance from '../src/pages/Attendance';
+import Attendance from '../src/pages/Attendance';
 import UserDetails from '../src/pages/UserDetails';
 // import StockCount from './pages/inventory/StockCount';
 // import WasteManagement from '../src/pages/inventory/WasteManagement';
 // import InventoryAndWasteHistory from '../src/pages/inventory/StockMovement';
 import AddUser from "../src/pages/admin/AddUser";
 import ChangePhoneNumber from "../src/pages/admin/phoneNumberChange"
+import ViewDetails from "./pages/teammember/ViewDetails";
+import MemberAttendance from "../src/pages/teammember/MemberAttendance";
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      
+
       {/* Common routes for all authenticated users */}
       <Route element={<ProtectedRoute allowedRoles={[
-        ROLES.ADMIN, 
-        ROLES.MANAGER, 
-        ROLES.TEAMLEADER, 
+        ROLES.ADMIN,
+        ROLES.MANAGER,
+        ROLES.TEAMLEADER,
         ROLES.TEAMMEMBER
       ]} />}>
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* <Route path="/attendance" element={<Attendance />} /> */}
+          <Route path="/attendance" element={<Attendance />} />
         </Route>
       </Route>
 
@@ -39,7 +41,15 @@ function AppRoutes() {
           <Route path="/users" element={<Users />} />
           <Route path="/users/:userId" element={<UserDetails />} />
           <Route path="/users/add-employee" element={<AddUser />} />
-           <Route path="/users/changephoneNumber" element={<ChangePhoneNumber />} />
+          <Route path="/users/changephoneNumber" element={<ChangePhoneNumber />} />
+        </Route>
+      </Route>
+
+     {/* for TeamMember  */}
+       <Route element={<ProtectedRoute allowedRoles={[ROLES.TEAMMEMBER]} />}>
+        <Route element={<Layout />}>
+          <Route path="/viewDetails" element={<ViewDetails />} />
+           <Route path="/memberattendance" element={<MemberAttendance />} />
         </Route>
       </Route>
 

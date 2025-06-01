@@ -65,10 +65,11 @@ const Login = () => {
 
     try {
       if (otp === userData.otp.toString()) {
-        await login(userData);
-        navigate(getDashboardPath(), { replace: true });
-      } else {
-        throw new Error("Invalid OTP");
+        await login({
+          ...userData,
+          loginTimestamp: Date.now() // Add login timestamp
+        });
+        navigate(getDashboardPath(), { replace: true }); // Replace history
       }
     } catch (err) {
       setError(err.message);

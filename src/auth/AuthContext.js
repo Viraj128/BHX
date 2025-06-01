@@ -1,50 +1,101 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { db } from '../firebase/config';
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
-// Session timeout duration in milliseconds (20 minutes)
-const SESSION_TIMEOUT = 20 * 60 * 1000;
-
+const SESSION_TIMEOUT = 20 * 60 * 1000; // 20 minutes
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [sessionActive, setSessionActive] = useState(false);
   const timeoutIdRef = useRef(null);
+  const sessionIdRef = useRef(null);
+    const [initializing, setInitializing] = useState(true); // Add initializing state
 
-  // On mount: restore session if valid
-  useEffect(() => {
+  // Generate unique session ID
+  const generateSessionId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+  // Restore session on mount
+ useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const sessionTimestamp = localStorage.getItem('sessionTimestamp');
+    const storedSessionId = localStorage.getItem('sessionId');
 
-    if (storedUser && sessionTimestamp) {
+    if (storedUser && sessionTimestamp && storedSessionId) {
       const timeElapsed = Date.now() - parseInt(sessionTimestamp, 10);
       if (timeElapsed < SESSION_TIMEOUT) {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
         setSessionActive(true);
+        sessionIdRef.current = storedSessionId;
       } else {
-        localStorage.removeItem('user');
-        localStorage.removeItem('sessionTimestamp');
-        setSessionActive(false);
+        clearSessionData();
       }
     }
+    setInitializing(false); // Mark initialization as complete
   }, []);
 
-  // Logout function - stable with useCallback
-  const logout = useCallback(() => {
-    setUser(null);
-    setSessionActive(false);
+  // Track tab close events
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      if (sessionIdRef.current && user?.phone) {
+        try {
+          const userRef = doc(db, 'userSessions', user.phone);
+          await setDoc(userRef, {
+            sessions: {
+              [sessionIdRef.current]: {
+                logoutTime: serverTimestamp()
+              }
+            }
+          }, { merge: true });
+        } catch (error) {
+          console.error("Error logging tab close:", error);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [user]);
+
+  const clearSessionData = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('sessionTimestamp');
-  }, []);
+    localStorage.removeItem('sessionId');
+  };
 
-  // Reset session timestamp in localStorage
+  const logout = useCallback(async () => {
+    if (sessionIdRef.current && user?.phone) {
+      try {
+        const userRef = doc(db, 'userSessions', user.phone);
+        await setDoc(userRef, {
+          sessions: {
+            [sessionIdRef.current]: {
+              logoutTime: serverTimestamp()
+            }
+          }
+        }, { merge: true });
+      } catch (error) {
+        console.error("Error logging logout time:", error);
+      }
+    }
+    
+    // Clear all state and storage
+    setUser(null);
+    setSessionActive(false);
+    sessionIdRef.current = null;
+    clearSessionData();
+  }, [user]);
+
   const resetSessionTimeout = useCallback(() => {
     localStorage.setItem('sessionTimestamp', Date.now().toString());
   }, []);
 
-  // Handle session timeout and activity monitoring
+  // Session timeout handler
   useEffect(() => {
     if (!sessionActive) {
-      // Clear any existing timeout if session is inactive
       if (timeoutIdRef.current) {
         clearTimeout(timeoutIdRef.current);
         timeoutIdRef.current = null;
@@ -52,35 +103,28 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    // Function to logout due to inactivity
     const onTimeout = () => {
       logout();
       alert('Session expired due to inactivity');
     };
 
-    // Set the initial timeout
     timeoutIdRef.current = setTimeout(onTimeout, SESSION_TIMEOUT);
 
-    // Activity handler to reset timeout and session timestamp
     const handleActivity = () => {
       resetSessionTimeout();
-
       if (timeoutIdRef.current) {
         clearTimeout(timeoutIdRef.current);
       }
       timeoutIdRef.current = setTimeout(onTimeout, SESSION_TIMEOUT);
     };
 
-    // Add event listeners for user activity
     window.addEventListener('mousemove', handleActivity);
     window.addEventListener('keydown', handleActivity);
     window.addEventListener('click', handleActivity);
 
-    // Cleanup function to remove listeners and clear timeout
     return () => {
       if (timeoutIdRef.current) {
         clearTimeout(timeoutIdRef.current);
-        timeoutIdRef.current = null;
       }
       window.removeEventListener('mousemove', handleActivity);
       window.removeEventListener('keydown', handleActivity);
@@ -88,26 +132,59 @@ export function AuthProvider({ children }) {
     };
   }, [sessionActive, logout, resetSessionTimeout]);
 
-  // Login function
-  const login = (userData) => {
+  const login = async (userData) => {
+    const sessionId = generateSessionId();
     const minimalUserData = {
-      phone: userData.phone,
+      name: userData.name,
       employeeID: userData.employeeID,
+      phone: userData.phone,
+      role: userData.role,
+      sessionId: sessionId,
     };
-    setUser(userData);
+
+    // Set user state
+    setUser(minimalUserData);
     setSessionActive(true);
+    sessionIdRef.current = sessionId;
+    
+    // Store in localStorage
     localStorage.setItem('user', JSON.stringify(minimalUserData));
     localStorage.setItem('sessionTimestamp', Date.now().toString());
+    localStorage.setItem('sessionId', sessionId);
+
+    // Log login to Firestore
+    try {
+      const userRef = doc(db, 'userSessions', userData.phone);
+      await setDoc(userRef, {
+        name: userData.name,
+        phone: userData.phone,
+        employeeID: userData.employeeID,
+        sessions: {
+          [sessionId]: {
+            loginTime: serverTimestamp(),
+            logoutTime: null
+          }
+        }
+      }, { merge: true });
+    } catch (error) {
+      console.error("Error logging login time:", error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, resetSessionTimeout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      resetSessionTimeout,
+      initializing // Expose initializing state
+    }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// Hook to access auth context
+// Add this missing hook export
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

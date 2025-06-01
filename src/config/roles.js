@@ -13,9 +13,11 @@ export const PATHS = {
   DASHBOARD: '/dashboard',
   USERS: '/users',
   ATTENDANCE: '/attendance',
+  MEMBERATTENDANCE: '/memberattendance',
   STOCK_COUNT: '/inventory/stock-count',
   WASTE_MANAGEMENT: '/inventory/waste-management',
   STOCK_MOVEMENT: '/inventory/stock-movement',
+  VIEWDETAILS: '/viewDetails',
 };
 
 // Utility function to return the dashboard path.

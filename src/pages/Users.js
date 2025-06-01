@@ -3,7 +3,9 @@ import { db } from "../firebase/config";
 import { collection, getDocs, query } from "firebase/firestore";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
-import { ROLES } from "../config/roles"; // Import ROLES for role checks
+import { ROLES } from "../config/roles";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton"; // Import Skeleton
+import "react-loading-skeleton/dist/skeleton.css"; // Import Skeleton CSS
 
 const Users = () => {
   const { user } = useAuth();
@@ -33,7 +35,7 @@ const Users = () => {
     Manager: 0,
     TeamLeader: 0,
     TeamMember: 0,
-    Customer: 0
+    Customer: 0,
   });
 
   // Sorting configuration
@@ -64,24 +66,24 @@ const Users = () => {
       Manager: 0,
       TeamLeader: 0,
       TeamMember: 0,
-      Customer: 0
+      Customer: 0,
     };
 
     // Apply role-based restrictions for team members
     const visibleTeamMembers = teamMembersList.filter((userData) => {
-      if (isAdmin) return true; // Admin sees all
+      if (isAdmin) return true;
       if (isManager) {
-        return userData.role === ROLES.TEAMLEADER || userData.role === ROLES.TEAMMEMBER; // Manager sees team leaders and team members
+        return userData.role === ROLES.TEAMLEADER || userData.role === ROLES.TEAMMEMBER;
       }
       if (isTeamLeader) {
-        return userData.role === ROLES.TEAMMEMBER; // Team leader sees only team members
+        return userData.role === ROLES.TEAMMEMBER;
       }
       return false;
     });
 
     // Set customer count (only for admin)
     if (isAdmin) {
-      counts.Customer = customersList.length; // Admin sees customers
+      counts.Customer = customersList.length;
     }
 
     // Calculate counts for visible team members
@@ -110,7 +112,7 @@ const Users = () => {
         countryCode: doc.data().countryCode || "+91",
         role: doc.data().role || "N/A",
         source: "teammember",
-        member_since: doc.data().member_since || null
+        member_since: doc.data().member_since || null,
       }));
 
       // Fetch customers
@@ -123,7 +125,7 @@ const Users = () => {
         countryCode: doc.data().countryCode || "+91",
         role: "Customer",
         source: "customer",
-        member_since: doc.data().member_since || null
+        member_since: doc.data().member_since || null,
       }));
 
       setTeamMembers(teamMembersData);
@@ -134,21 +136,20 @@ const Users = () => {
     } finally {
       setLoading(false);
     }
-  }, [isAdmin, isManager, isTeamLeader]); // Dependencies for role-based filtering
+  }, [isAdmin, isManager, isTeamLeader]);
 
   // Filter and sort data
   const filterData = useCallback(() => {
     const search = debouncedSearch.toLowerCase();
     const normalizedRoleFilter = roleFilter.toLowerCase();
 
-    // Apply role-based restrictions for team members
     const visibleTeamMembers = teamMembers.filter((userData) => {
-      if (isAdmin) return true; // Admin sees all
+      if (isAdmin) return true;
       if (isManager) {
-        return userData.role === ROLES.TEAMLEADER || userData.role === ROLES.TEAMMEMBER; // Manager sees team leaders and team members
+        return userData.role === ROLES.TEAMLEADER || userData.role === ROLES.TEAMMEMBER;
       }
       if (isTeamLeader) {
-        return userData.role === ROLES.TEAMMEMBER; // Team leader sees only team members
+        return userData.role === ROLES.TEAMMEMBER;
       }
       return false;
     });
@@ -161,7 +162,7 @@ const Users = () => {
         userData.name.toLowerCase(),
         userData.phone.toLowerCase(),
         userData.userId.toLowerCase(),
-        userData.role.toLowerCase()
+        userData.role.toLowerCase(),
       ].some((field) => field.includes(search));
 
       const matchesRole =
@@ -179,10 +180,10 @@ const Users = () => {
           return [
             customer.name.toLowerCase(),
             customer.phone.toLowerCase(),
-            customer.userId.toLowerCase()
+            customer.userId.toLowerCase(),
           ].some((field) => field.includes(search));
         })
-      : []; // Managers and team leaders can't see customers
+      : [];
 
     // Sort team members
     const sortedTeamMems = [...filteredTeamMems].sort((a, b) => {
@@ -233,14 +234,14 @@ const Users = () => {
     userTypeFilter,
     isAdmin,
     isManager,
-    isTeamLeader
+    isTeamLeader,
   ]);
 
   // Sorting handlers
   const sortUsers = (key) => {
     setSortConfig((prev) => ({
       key,
-      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc"
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
     }));
   };
 
@@ -279,54 +280,98 @@ const Users = () => {
     loadUsers();
   }, [loadUsers, location, navigate]);
 
+  // Skeleton for Summary Cards
+  const renderSummarySkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+      {Array(6)
+        .fill()
+        .map((_, index) => (
+          <div key={index} className="bg-white p-4 rounded-lg shadow">
+            <Skeleton height={20} width={100} />
+            <Skeleton height={30} width={60} style={{ marginTop: 8 }} />
+          </div>
+        ))}
+    </div>
+  );
+
+  // Skeleton for Table Rows
+  const renderTableSkeleton = (columns, rows = 5) => (
+    <tbody className="bg-white divide-y divide-gray-200">
+      {Array(rows)
+        .fill()
+        .map((_, index) => (
+          <tr key={index}>
+            {Array(columns)
+              .fill()
+              .map((_, colIndex) => (
+                <td
+                  key={colIndex}
+                  className="px-6 py-4 whitespace-nowrap text-sm"
+                >
+                  <Skeleton height={20} />
+                </td>
+              ))}
+          </tr>
+        ))}
+    </tbody>
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">User Management</h1>
-        <button
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
-          onClick={() => navigate("/users/add-employee")}
-        >
-          <span className="mr-2">+</span> Add User
-        </button>
+        {isAdmin && (
+          <button
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
+            onClick={() => navigate("/users/add-employee")}
+          >
+            <span className="mr-2">+</span> Add User
+          </button>
+        )}
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-gray-500 text-sm">Total Users</h3>
-          <p className="text-2xl font-bold">
-            {filteredTeamMembers.length + filteredCustomers.length}
-          </p>
-        </div>
-        {Object.entries(roleCounts).map(([role, count]) => (
-          <div key={role} className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-gray-500 text-sm">
-              {role === "TeamLeader"
-                ? "Team Leaders"
-                : role === "TeamMember"
-                ? "Team Members"
-                : role + "s"}
-            </h3>
-            <p
-              className={`text-2xl font-bold ${
-                role === "Admin"
-                  ? "text-purple-600"
-                  : role === "Manager"
-                  ? "text-blue-600"
-                  : role === "TeamLeader"
-                  ? "text-green-600"
-                  : role === "TeamMember"
-                  ? "text-yellow-600"
-                  : "text-red-600"
-              }`}
-            >
-              {count}
-            </p>
+      <SkeletonTheme baseColor="#e5e7eb" highlightColor="#f3f4f6">
+        {loading ? (
+          renderSummarySkeleton()
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-gray-500 text-sm">Total Users</h3>
+              <p className="text-2xl font-bold">
+                {filteredTeamMembers.length + filteredCustomers.length}
+              </p>
+            </div>
+            {Object.entries(roleCounts).map(([role, count]) => (
+              <div key={role} className="bg-white p-4 rounded-lg shadow">
+                <h3 className="text-gray-500 text-sm">
+                  {role === "TeamLeader"
+                    ? "Team Leaders"
+                    : role === "TeamMember"
+                    ? "Team Members"
+                    : role + "s"}
+                </h3>
+                <p
+                  className={`text-2xl font-bold ${
+                    role === "Admin"
+                      ? "text-purple-600"
+                      : role === "Manager"
+                      ? "text-blue-600"
+                      : role === "TeamLeader"
+                      ? "text-green-600"
+                      : role === "TeamMember"
+                      ? "text-yellow-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {count}
+                </p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        )}
+      </SkeletonTheme>
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-lg shadow mb-6 sticky top-0 z-10">
@@ -346,7 +391,7 @@ const Users = () => {
             >
               <option value="all">All Users</option>
               <option value="teammembers">Team Members Only</option>
-              {isAdmin && <option value="customers">Customers Only</option>} {/* Only admin sees customers option */}
+              {isAdmin && <option value="customers">Customers Only</option>}
             </select>
           </div>
 
@@ -365,10 +410,10 @@ const Users = () => {
                 onChange={(e) => setRoleFilter(e.target.value)}
               >
                 <option value="all">All Team Members</option>
-                {isAdmin && <option value="admin">Admin</option>} {/* Admin sees all roles */}
+                {isAdmin && <option value="admin">Admin</option>}
                 {(isAdmin || isManager) && <option value="manager">Manager</option>}
                 {(isAdmin || isManager) && <option value="teamleader">Team Leader</option>}
-                <option value="teammember">Team Member</option> {/* Everyone sees team members */}
+                <option value="teammember">Team Member</option>
               </select>
             </div>
           )}
@@ -422,45 +467,51 @@ const Users = () => {
                   )}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredTeamMembers.map((userData) => (
-                  <tr
-                    key={userData.userId}
-                    className="hover:bg-gray-50 cursor-pointer"
-                   onClick={() => navigate(`/users/${userData.userId}`)}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {userData.userId}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {userData.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {userData.countryCode} {userData.phone}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {userData.member_since
-                        ? new Date(userData.member_since).toLocaleDateString()
-                        : "N/A"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          userData.role.toLowerCase() === "admin"
-                            ? "bg-purple-100 text-purple-800"
-                            : userData.role.toLowerCase() === "manager"
-                            ? "bg-blue-100 text-blue-800"
-                            : userData.role.toLowerCase() === "teamleader"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
+              <SkeletonTheme baseColor="#e5e7eb" highlightColor="#f3f4f6">
+                {loading ? (
+                  renderTableSkeleton(5) // 5 columns for team members
+                ) : (
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredTeamMembers.map((userData) => (
+                      <tr
+                        key={userData.userId}
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => navigate(`/users/${userData.userId}`)}
                       >
-                        {userData.role}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {userData.userId}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {userData.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {userData.countryCode} {userData.phone}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {userData.member_since
+                            ? new Date(userData.member_since).toLocaleDateString()
+                            : "N/A"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              userData.role.toLowerCase() === "admin"
+                                ? "bg-purple-100 text-purple-800"
+                                : userData.role.toLowerCase() === "manager"
+                                ? "bg-blue-100 text-blue-800"
+                                : userData.role.toLowerCase() === "teamleader"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {userData.role}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
+              </SkeletonTheme>
             </table>
           </div>
         </div>
@@ -494,25 +545,31 @@ const Users = () => {
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredCustomers.map((customer) => (
-                  <tr
-                    key={customer.userId}
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => navigate(`/users/${customer.userId}`)}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {customer.userId}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {customer.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {customer.countryCode} {customer.phone}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+              <SkeletonTheme baseColor="#e5e7eb" highlightColor="#f3f4f6">
+                {loading ? (
+                  renderTableSkeleton(3) // 3 columns for customers
+                ) : (
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredCustomers.map((customer) => (
+                      <tr
+                        key={customer.userId}
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => navigate(`/users/${customer.userId}`)}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {customer.userId}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {customer.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {customer.countryCode} {customer.phone}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
+              </SkeletonTheme>
             </table>
           </div>
         </div>

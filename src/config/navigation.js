@@ -19,7 +19,18 @@ export const NAV_ITEMS = [
     // Attendance page available to all roles
     label: 'Attendance',
     path: PATHS.ATTENDANCE,
-    roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER, ROLES.TEAMMEMBER]
+    roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
+  },
+    {
+    // Attendance page available to all roles
+    label: 'Attendance',
+    path: PATHS.MEMBERATTENDANCE,
+    roles: [ROLES.TEAMMEMBER]
+  },
+  {
+    label: 'View Details',
+    path: PATHS.VIEWDETAILS,
+    roles: [ROLES.TEAMMEMBER]
   },
   {
     // Inventory is a collapsible section with sub-items, only for Admin, Manager, and Team Leader

@@ -4,60 +4,67 @@ import { useNavigate } from 'react-router-dom';
 import { ROLES } from '../config/roles';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
-const Sidebar = ({ user }) => {
-  const { logout } = useAuth();
+const Sidebar = () => {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
   const [isCashManagementOpen, setIsCashManagementOpen] = useState(false);
   const [isItemsManagementOpen, setIsItemsManagementOpen] = useState(false);
   const [isCustomerTrackingOpen, setIsCustomerTrackingOpen] = useState(false);
-  
+
   const isAdmin = user?.role === ROLES.ADMIN;
   const isManager = user?.role === ROLES.MANAGER;
   const isTeamLeader = user?.role === ROLES.TEAMLEADER;
   const isTeamMember = user?.role === ROLES.TEAMMEMBER;
 
-  const formatTime = (date) => {
-    if (!date) return '';
-    const d = date.toDate ? date.toDate() : new Date(date);
-    return d.toLocaleTimeString('en-US', {
+  // FIX: Improved timestamp handling
+  const formatTime = (timestamp) => {
+    if (!timestamp) return '';
+
+    // Handle both string and number formats
+    const ts = typeof timestamp === 'string'
+      ? parseInt(timestamp, 10)
+      : timestamp;
+
+    if (isNaN(ts)) return '';
+
+    return new Date(ts).toLocaleTimeString('en-GB', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
+      timeZone: 'Europe/London'
     });
   };
 
   const handleLogout = () => {
     logout();
+    // Clear navigation history
     navigate('/login', { replace: true });
   };
 
   return (
     <div className="w-64 bg-white h-[100vh] p-4 flex flex-col border-r border-gray-200 fixed top-0 left-0">
-      {/* Brand Header */}
       <div className="text-gray-800 mb-6">
         <h1 className="text-xl font-bold mb-1">BHX - Bhookie</h1>
         <div className="h-px bg-gray-200 w-full"></div>
       </div>
 
-      {/* User Info */}
       <div className="text-gray-800 mb-8">
-        <h2 className="text-lg font-semibold">{user?.name}</h2>
-        <p className="text-sm text-gray-600">{user?.role}</p>
+        <h2 className="text-lg font-semibold">{user?.name || 'Unknown'}</h2>
+        <p className="text-sm text-gray-600">{user?.role || 'Unknown'}</p>
         <p className="text-xs text-gray-500 mt-1">
-          Active since: {formatTime(user?.createdAt)}
+          Active since: {formatTime(user?.loginTimestamp)}
         </p>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 space-y-1">
-        <button 
+        <button
           className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
           onClick={() => navigate('/dashboard')}
         >
           Dashboard
         </button>
-        
+
         {(isAdmin || isManager || isTeamLeader) && (
           <button
             className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -66,19 +73,40 @@ const Sidebar = ({ user }) => {
             User Management
           </button>
         )}
-        
-        {(isAdmin || isManager || isTeamLeader || isTeamMember) && (
+
+
+        {(isTeamMember) && (
           <button
             className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-            onClick={() => navigate('/attendance')}
+            onClick={() => navigate('/viewDetails')}
+          >
+            View Details
+          </button>
+        )}
+
+         {(isTeamMember) && (
+          <button
+            className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+            onClick={() => navigate('/memberattendance')}
           >
             Attendance Records
           </button>
         )}
-        
+
+
+      
+
+        {(isAdmin || isManager || isTeamLeader) && (
+          <button
+            className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+            onClick={() => navigate('/attendance')}
+          >
+            Attendance 
+          </button>
+        )}
+
         {(isAdmin || isManager || isTeamLeader) && (
           <>
-            {/* Inventory */}
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -91,7 +119,7 @@ const Sidebar = ({ user }) => {
                   <ChevronRightIcon className="h-4 w-4" />
                 )}
               </button>
-              
+
               {isInventoryOpen && (
                 <div className="ml-4 space-y-1">
                   <button
@@ -116,7 +144,6 @@ const Sidebar = ({ user }) => {
               )}
             </div>
 
-            {/* Cash Management */}
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -129,7 +156,7 @@ const Sidebar = ({ user }) => {
                   <ChevronRightIcon className="h-4 w-4" />
                 )}
               </button>
-              
+
               {isCashManagementOpen && (
                 <div className="ml-4 space-y-1">
                   <button
@@ -148,7 +175,6 @@ const Sidebar = ({ user }) => {
               )}
             </div>
 
-            {/* Items Management */}
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -161,7 +187,7 @@ const Sidebar = ({ user }) => {
                   <ChevronRightIcon className="h-4 w-4" />
                 )}
               </button>
-              
+
               {isItemsManagementOpen && (
                 <div className="ml-4 space-y-1">
                   <button
@@ -195,7 +221,7 @@ const Sidebar = ({ user }) => {
                 <ChevronRightIcon className="h-4 w-4" />
               )}
             </button>
-            
+
             {isCustomerTrackingOpen && (
               <div className="ml-4 space-y-1">
                 <button
@@ -216,7 +242,6 @@ const Sidebar = ({ user }) => {
         )}
       </nav>
 
-      {/* Logout */}
       <div className="mt-auto pt-4 border-t border-gray-200">
         <button
           onClick={handleLogout}
