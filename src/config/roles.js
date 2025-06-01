@@ -13,7 +13,6 @@ export const PATHS = {
   DASHBOARD: '/dashboard',
   USERS: '/users',
   ATTENDANCE: '/attendance',
-  MEMBERATTENDANCE: '/memberattendance',
   STOCK_COUNT: '/inventory/stock-count',
   WASTE_MANAGEMENT: '/inventory/waste-management',
   INVENTORY_RECORDS: '/inventory/inventoryrecords',

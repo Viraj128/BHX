@@ -7,7 +7,7 @@ import { getAuth, updateEmail, onAuthStateChanged, sendEmailVerification } from 
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useAuth } from '../auth/AuthContext';
-import {ROLES , PATH} from '../config/roles';
+import {ROLES} from '../config/roles';
 
 
 // Define field access rules
@@ -69,6 +69,9 @@ const UserDetails = () => {
   const currentUserRole = currentUser?.role || ROLES.TEAMMEMBER;
   const editableFields = fieldAccessRules[currentUserRole]?.editable || [];
 
+    // console.log('Current User:', currentUserRole);
+    // console.log('isAdmin:', isAdmin, 'ROLES.ADMIN:', ROLES.ADMIN, 'currentUser?.role:', currentUser?.role);
+  
   useEffect(() => {
     const auth = getAuth();
 

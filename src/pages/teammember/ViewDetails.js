@@ -78,7 +78,7 @@ const ViewDetails = () => {
       `}</style>
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 space-y-6">
         <h1 className="text-3xl font-bold text-center text-gray-800">
-          Team Member Lookup
+        
         </h1>
 
         <div className="space-y-4">

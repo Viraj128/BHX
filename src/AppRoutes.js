@@ -14,7 +14,6 @@ import InventoryAndWasteHistory from '../src/pages/inventory/StockMovement';
 import AddUser from "../src/pages/admin/AddUser";
 import ChangePhoneNumber from "../src/pages/admin/phoneNumberChange"
 import ViewDetails from "./pages/teammember/ViewDetails";
-import MemberAttendance from "../src/pages/teammember/MemberAttendance";
 import InventoryRecords from "./pages/inventory/inventoryrecords";
 import AddInventory from './pages/inventory/Addinventory';
 
@@ -51,7 +50,6 @@ function AppRoutes() {
        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEAMMEMBER]} />}>
         <Route element={<Layout />}>
           <Route path="/viewDetails" element={<ViewDetails />} />
-           <Route path="/memberattendance" element={<MemberAttendance />} />
         </Route>
       </Route>
 

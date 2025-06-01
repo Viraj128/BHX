@@ -7,10 +7,7 @@ import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isInventoryOpen, setIsInventoryOpen] = useState(false);
-  const [isCashManagementOpen, setIsCashManagementOpen] = useState(false);
-  const [isItemsManagementOpen, setIsItemsManagementOpen] = useState(false);
-  const [isCustomerTrackingOpen, setIsCustomerTrackingOpen] = useState(false);
+  const [openSection, setOpenSection] = useState(null); // Tracks the currently open section
 
   const isAdmin = user?.role === ROLES.ADMIN;
   const isManager = user?.role === ROLES.MANAGER;
@@ -40,6 +37,11 @@ const Sidebar = () => {
     logout();
     // Clear navigation history
     navigate('/login', { replace: true });
+  };
+
+  // Toggle a section and close others
+  const toggleSection = (section) => {
+    setOpenSection(openSection === section ? null : section);
   };
 
   return (
@@ -74,7 +76,6 @@ const Sidebar = () => {
           </button>
         )}
 
-
         {(isTeamMember) && (
           <button
             className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -84,24 +85,12 @@ const Sidebar = () => {
           </button>
         )}
 
-         {(isTeamMember) && (
-          <button
-            className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-            onClick={() => navigate('/memberattendance')}
-          >
-            Attendance Records
-          </button>
-        )}
-
-
-      
-
-        {(isAdmin || isManager || isTeamLeader) && (
+        {(isAdmin || isManager || isTeamLeader || isTeamMember) && (
           <button
             className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
             onClick={() => navigate('/attendance')}
           >
-            Attendance 
+            Attendance
           </button>
         )}
 
@@ -110,17 +99,17 @@ const Sidebar = () => {
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-                onClick={() => setIsInventoryOpen(!isInventoryOpen)}
+                onClick={() => toggleSection('inventory')}
               >
                 <span>Inventory</span>
-                {isInventoryOpen ? (
+                {openSection === 'inventory' ? (
                   <ChevronDownIcon className="h-4 w-4" />
                 ) : (
                   <ChevronRightIcon className="h-4 w-4" />
                 )}
               </button>
 
-              {isInventoryOpen && (
+              {openSection === 'inventory' && (
                 <div className="ml-4 space-y-1">
                   <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
@@ -140,13 +129,14 @@ const Sidebar = () => {
                   >
                     Stock Movement
                   </button>
-                  
-                   {(isAdmin) && (<button
-                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/inventory/inventoryrecords')}
-                  >
-                    Inventory Records
-                  </button>)}
+                  {(isAdmin) && (
+                    <button
+                      className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                      onClick={() => navigate('/inventory/inventoryrecords')}
+                    >
+                      Inventory Records
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -154,17 +144,16 @@ const Sidebar = () => {
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-                onClick={() => setIsCashManagementOpen(!isCashManagementOpen)}
+                onClick={() => toggleSection('cashManagement')}
               >
                 <span>Cash Management</span>
-                {isCashManagementOpen ? (
+                {openSection === 'cashManagement' ? (
                   <ChevronDownIcon className="h-4 w-4" />
                 ) : (
-                  <ChevronRightIcon className="h-4 w-4" />
-                )}
+                  <ChevronRightIcon className="h-4 w-4" />)}
               </button>
 
-              {isCashManagementOpen && (
+              {openSection === 'cashManagement' && (
                 <div className="ml-4 space-y-1">
                   <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
@@ -185,17 +174,17 @@ const Sidebar = () => {
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-                onClick={() => setIsItemsManagementOpen(!isItemsManagementOpen)}
+                onClick={() => toggleSection('itemsManagement')}
               >
                 <span>Items Management</span>
-                {isItemsManagementOpen ? (
+                {openSection === 'itemsManagement' ? (
                   <ChevronDownIcon className="h-4 w-4" />
                 ) : (
                   <ChevronRightIcon className="h-4 w-4" />
                 )}
               </button>
 
-              {isItemsManagementOpen && (
+              {openSection === 'itemsManagement' && (
                 <div className="ml-4 space-y-1">
                   <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
@@ -219,17 +208,17 @@ const Sidebar = () => {
           <div className="space-y-1">
             <button
               className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-              onClick={() => setIsCustomerTrackingOpen(!isCustomerTrackingOpen)}
+              onClick={() => toggleSection('customerTracking')}
             >
               <span>Customer Tracking</span>
-              {isCustomerTrackingOpen ? (
+              {openSection === 'customerTracking' ? (
                 <ChevronDownIcon className="h-4 w-4" />
               ) : (
                 <ChevronRightIcon className="h-4 w-4" />
               )}
             </button>
 
-            {isCustomerTrackingOpen && (
+            {openSection === 'customerTracking' && (
               <div className="ml-4 space-y-1">
                 <button
                   className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
