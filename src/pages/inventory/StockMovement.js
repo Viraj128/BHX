@@ -12,6 +12,8 @@ import {
   FaTrashAlt,
   FaBalanceScale,
 } from 'react-icons/fa';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 // Updated getTimeOfDayIcon to exclude "evening"
 const getTimeOfDayIcon = (timeOfDay) => {
@@ -234,8 +236,97 @@ const InventoryAndWasteHistory = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent" />
+      <div className="p-6 max-w-7xl mx-auto space-y-6">
+        <SkeletonTheme baseColor="#e5e7eb" highlightColor="#f3f4f6">
+          {/* Filter Section Skeleton */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <Skeleton width={200} height={28} />
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <div className="flex gap-2">
+                <Skeleton width={150} height={40} />
+                <Skeleton width={120} height={40} />
+              </div>
+              <Skeleton width={100} height={40} />
+            </div>
+          </div>
+          {/* Log Sections Skeleton */}
+          {[...Array(3)].map((_, index) => (
+            <div key={index} className="bg-white rounded-lg border shadow-sm">
+              <div className="p-4 flex justify-between items-center">
+                <div>
+                  <Skeleton width={150} height={20} />
+                  <Skeleton width={100} height={16} className="mt-2" />
+                </div>
+                <Skeleton width={20} height={20} />
+              </div>
+              <div className="border-t p-4 space-y-6">
+                {/* Waste Log Skeleton */}
+                <div>
+                  <Skeleton width={120} height={24} className="mb-4" />
+                  <div className="mb-6">
+                    <Skeleton width={200} height={16} className="mb-2" />
+                    <table className="w-full table-auto">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          {[...Array(7)].map((_, i) => (
+                            <th key={i} className="p-3">
+                              <Skeleton width={80} height={16} />
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...Array(2)].map((_, i) => (
+                          <tr key={i} className="border-t">
+                            <td className="p-3"><Skeleton width={150} height={16} /></td>
+                            <td className="p-3"><Skeleton width={100} height={16} /></td>
+                            <td className="p-3"><Skeleton width={50} height={16} /></td>
+                            <td className="p-3"><Skeleton width={50} height={16} /></td>
+                            <td className="p-3"><Skeleton width={50} height={16} /></td>
+                            <td className="p-3"><Skeleton width={50} height={16} /></td>
+                            <td className="p-3"><Skeleton width={120} height={16} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                {/* Inventory Log Skeleton */}
+                <div>
+                  <Skeleton width={120} height={24} className="mb-4" />
+                  <div className="mb-6">
+                    <Skeleton width={200} height={16} className="mb-2" />
+                    <table className="w-full table-auto">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          {[...Array(8)].map((_, i) => (
+                            <th key={i} className="p-3">
+                              <Skeleton width={80} height={16} />
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...Array(2)].map((_, i) => (
+                          <tr key={i} className="border-t">
+                            <td className="p-3"><Skeleton width={150} height={16} /></td>
+                            <td className="p-3"><Skeleton width={100} height={16} /></td>
+                            <td className="p-3"><Skeleton width={50} height={16} /></td>
+                            <td className="p-3"><Skeleton width={50} height={16} /></td>
+                            <td className="p-3"><Skeleton width={50} height={16} /></td>
+                            <td className="p-3"><Skeleton width={50} height={16} /></td>
+                            <td className="p-3"><Skeleton width={50} height={16} /></td>
+                            <td className="p-3"><Skeleton width={100} height={16} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </SkeletonTheme>
       </div>
     );
   }

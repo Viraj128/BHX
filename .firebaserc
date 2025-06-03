@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "bhookiecore"
+  },
+  "targets": {
+    "bhookiecore": {
+      "hosting": {
+        "main-database2": [
+          "main-database2"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
 import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
 import InventoryManagement from './InventoryManagement ';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const StockCount = () => {
   const [inventoryItems, setInventoryItems] = useState([]);
@@ -27,7 +29,7 @@ const StockCount = () => {
             return {
               id: docSnap.id,
               itemName: data.itemName || 'Unknown Item',
-              unit: 'EA',
+              unit: data.unit || '', // Fetch unit from Firebase
               boxes: '',
               innerPacks: '',
               units: '',
@@ -152,6 +154,7 @@ const StockCount = () => {
           setDoc(variantItemRef, {
             itemId: item.id,
             itemName: item.itemName,
+            unit: item.unit, // Include unit in inventory log
             boxesCount: item.boxes,
             innerCount: item.innerPacks,
             unitsCount: item.units,
@@ -264,8 +267,6 @@ const StockCount = () => {
     item.itemName.toLowerCase().includes(searchQuery)
   );
 
-  if (loading) return <div className="p-4">Loading inventory data...</div>;
-
   if (showStockCountLog) {
     return (
       <div className="flex-1 p-6 overflow-auto">
@@ -292,7 +293,6 @@ const StockCount = () => {
           placeholder="Search items..."
           className="border rounded p-2 flex-1"
         />
-
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -302,7 +302,6 @@ const StockCount = () => {
           />
           <label>Select All</label>
         </div>
-
         <button
           onClick={handleSaveAllApplied}
           className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
@@ -311,7 +310,7 @@ const StockCount = () => {
         </button>
         <button
           onClick={() => setShowStockCountLog(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-purple-700"
+          className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700"
         >
           Stock Count Log
         </button>
@@ -331,60 +330,76 @@ const StockCount = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredItems.map(item => {
-              const isSubmitted = submittedItems[item.id];
-              const hasHighlight = itemsToHighlight.includes(item.id);
-              const currentVariance = calculateStock(item) - item.totalStockOnHand;
+            {loading ? (
+              <SkeletonTheme baseColor="#e5e7eb" highlightColor="#f3f4f6">
+                {[...Array(5)].map((_, index) => (
+                  <tr key={index}>
+                    <td className="p-3"><Skeleton width={150} height={20} /></td>
+                    <td className="p-3"><Skeleton width={50} height={20} /></td>
+                    <td className="p-3"><Skeleton width={80} height={20} /></td>
+                    <td className="p-3"><Skeleton width={80} height={20} /></td>
+                    <td className="p-3"><Skeleton width={80} height={20} /></td>
+                    <td className="p-3"><Skeleton width={20} height={20} /></td>
+                    <td className="p-3"><Skeleton width={50} height={20} /></td>
+                  </tr>
+                ))}
+              </SkeletonTheme>
+            ) : (
+              filteredItems.map(item => {
+                const isSubmitted = submittedItems[item.id];
+                const hasHighlight = itemsToHighlight.includes(item.id);
+                const currentVariance = calculateStock(item) - item.totalStockOnHand;
 
-              return (
-                <tr key={item.id} className={hasHighlight ? 'bg-yellow-50' : ''}>
-                  <td className="p-3 font-medium">{item.itemName}</td>
-                  <td className="p-3">{item.unit}</td>
-                  <td className="p-3">
-                    <input
-                      type="number"
-                      value={item.boxes}
-                      onChange={(e) => handleInputChange(item.id, 'boxes', e.target.value)}
-                      className={`border rounded p-2 w-20 ${hasHighlight ? 'border-red-500' : ''}`}
-                      disabled={isSubmitted}
-                    />
-                  </td>
-                  <td className="p-3">
-                    <input
-                      type="number"
-                      value={item.innerPacks}
-                      onChange={(e) => handleInputChange(item.id, 'innerPacks', e.target.value)}
-                      className={`border rounded p-2 w-20 ${hasHighlight ? 'border-red-500' : ''}`}
-                      disabled={isSubmitted}
-                    />
-                  </td>
-                  <td className="p-3">
-                    <input
-                      type="number"
-                      value={item.units}
-                      onChange={(e) => handleInputChange(item.id, 'units', e.target.value)}
-                      className={`border rounded p-2 w-20 ${hasHighlight ? 'border-red-500' : ''}`}
-                      disabled={isSubmitted}
-                    />
-                  </td>
-                  <td className="p-3">
-                    <input
-                      type="checkbox"
-                      checked={appliedCounts[item.id] || false}
-                      onChange={() => handleTickChange(item.id)}
-                      disabled={isSubmitted}
-                    />
-                  </td>
-                  <td className="p-3 font-medium">
-                    {(isSubmitted || showRecountVariances.includes(item.id)) && (
-                      <span className={currentVariance !== 0 ? 'text-red-600' : 'text-green-600'}>
-                        {currentVariance}
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+                return (
+                  <tr key={item.id} className={hasHighlight ? 'bg-yellow-50' : ''}>
+                    <td className="p-3 font-medium">{item.itemName}</td>
+                    <td className="p-3">{item.unit || 'N/A'}</td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        value={item.boxes}
+                        onChange={(e) => handleInputChange(item.id, 'boxes', e.target.value)}
+                        className={`border rounded p-2 w-20 ${hasHighlight ? 'border-red-500' : ''}`}
+                        disabled={isSubmitted}
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        value={item.innerPacks}
+                        onChange={(e) => handleInputChange(item.id, 'innerPacks', e.target.value)}
+                        className={`border rounded p-2 w-20 ${hasHighlight ? 'border-red-500' : ''}`}
+                        disabled={isSubmitted}
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        value={item.units}
+                        onChange={(e) => handleInputChange(item.id, 'units', e.target.value)}
+                        className={`border rounded p-2 w-20 ${hasHighlight ? 'border-red-500' : ''}`}
+                        disabled={isSubmitted}
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="checkbox"
+                        checked={appliedCounts[item.id] || false}
+                        onChange={() => handleTickChange(item.id)}
+                        disabled={isSubmitted}
+                      />
+                    </td>
+                    <td className="p-3 font-medium">
+                      {(isSubmitted || showRecountVariances.includes(item.id)) && (
+                        <span className={currentVariance !== 0 ? 'text-red-600' : 'text-green-600'}>
+                          {currentVariance}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>

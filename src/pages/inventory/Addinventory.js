@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../firebase/config';
 import { collection, doc, setDoc, serverTimestamp, getDocs } from 'firebase/firestore';
+import Skeleton from 'react-loading-skeleton';
 
 const Addinventory = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     itemId: '',
     itemName: '',
+    unit: 'EA', // Default unit
     unitsPerInner: '',
     innerPerBox: '',
     boxes: '',
@@ -15,6 +17,8 @@ const Addinventory = () => {
     units: '',
   });
   const [stockOnHand, setStockOnHand] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Update stockOnHand whenever relevant fields change
   useEffect(() => {
@@ -42,12 +46,14 @@ const Addinventory = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const { itemId, itemName, unitsPerInner, innerPerBox, boxes, inners, units } = form;
+    const { itemId, itemName, unit, unitsPerInner, innerPerBox, boxes, inners, units } = form;
 
     // Check all fields are filled
     if (!itemId || !itemName || !unitsPerInner || !innerPerBox || boxes === '' || inners === '' || units === '') {
       alert('All fields are required.');
+      setIsSubmitting(false);
       return;
     }
 
@@ -56,6 +62,7 @@ const Addinventory = () => {
     const match = normalizedInputId.match(/^item0*(\d+)$/); // e.g., item07 -> 7
     if (!match) {
       alert('Invalid item ID format. Use format like "item07" or "item7".');
+      setIsSubmitting(false);
       return;
     }
 
@@ -64,6 +71,7 @@ const Addinventory = () => {
     const normalizedItemNameForCheck = itemName.trim().toLowerCase().replace(/\s+/g, '');
 
     try {
+      setLoading(true);
       // Check for duplicate itemId or itemName
       const snapshot = await getDocs(collection(db, 'inventory'));
       let itemIdExists = false;
@@ -90,10 +98,14 @@ const Addinventory = () => {
 
       if (itemIdExists) {
         alert('This item ID already exists. Please try another one.');
+        setIsSubmitting(false);
+        setLoading(false);
         return;
       }
       if (itemNameExists) {
         alert('This item name (or a variation like "vada pav", "vadapav", "VadaPav") already exists. Please try another one.');
+        setIsSubmitting(false);
+        setLoading(false);
         return;
       }
 
@@ -114,6 +126,7 @@ const Addinventory = () => {
       await setDoc(itemDocRef, {
         itemId: normalizedInputId, // e.g., item7
         itemName: normalizedItemName,
+        unit: unit, // Save the unit
         unitsPerInner: unitsPerInnerNum, // Store as number
         innerPerBox: innerPerBoxNum,     // Store as number
         totalStockOnHand: totalStockOnHand, // Store as number
@@ -124,6 +137,7 @@ const Addinventory = () => {
       setForm({
         itemId: '',
         itemName: '',
+        unit: 'EA',
         unitsPerInner: '',
         innerPerBox: '',
         boxes: '',
@@ -133,48 +147,201 @@ const Addinventory = () => {
       setStockOnHand(0);
 
       setTimeout(() => {
-        navigate('/admin/inventory/inventoryrecords');
+        navigate('/inventory/inventoryrecords');
       }, 1500);
     } catch (err) {
       console.error('Error adding inventory:', err);
       alert('Failed to add inventory. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="max-w-xl mx-auto mt-16 p-8 bg-white border border-gray-300 rounded-2xl shadow-lg">
-      <h2 className="text-xl font-bold mb-4 text-center">Add New Inventory</h2>
+  if (loading) {
+    return (
+      <div className="max-w-xl mx-auto mt-16 p-8 bg-white border border-gray-300 rounded-2xl shadow-lg">
+        <h2 className="text-xl font-bold mb-8 text-center">
+          <Skeleton width={200} height={30} />
+        </h2>
+        
+        <div className="space-y-6">
+          {[...Array(8)].map((_, i) => (
+            <div key={i}>
+              <Skeleton width={120} height={20} className="mb-2" />
+              <Skeleton height={40} />
+            </div>
+          ))}
+          <div className="mt-6">
+            <Skeleton height={45} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {['itemId', 'itemName', 'unitsPerInner', 'innerPerBox', 'boxes', 'inners', 'units'].map((field) => (
-          <div key={field}>
-            <label className="block font-semibold capitalize">
-              {field === 'inners' ? 'Inner' : field}
+  return (
+    <div className="max-w-xl mx-auto mt-8 md:mt-16 p-6 md:p-8 bg-white border border-gray-200 rounded-2xl shadow-xl">
+      <div className="mb-6 text-center">
+        <h2 className="text-2xl font-bold text-gray-800">Add New Inventory</h2>
+        <p className="text-gray-600 mt-2">Fill in the details to add a new inventory item</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Item ID <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              name={field}
-              value={form[field]}
+              name="itemId"
+              value={form.itemId}
               onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
-              placeholder={`Enter ${field === 'inners' ? 'Inner' : field}`}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g., item07"
+            />
+            <p className="text-xs text-gray-500 mt-1">Format: item01, item02, etc.</p>
+          </div>
+          
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Item Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="itemName"
+              value={form.itemName}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter item name"
             />
           </div>
-        ))}
+        </div>
 
-        {/* Display Stock On Hand */}
-        <div className="mt-4">
-          <label className="block font-semibold">Stock On Hand</label>
-          <div className="w-full border px-3 py-2 rounded bg-gray-100">
-            {stockOnHand}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Unit <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="unit"
+              value={form.unit}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="EA">EA (Each)</option>
+              <option value="KG">KG (Kilogram)</option>
+            </select>
+          </div>
+          
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Units Per Inner <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="unitsPerInner"
+              value={form.unitsPerInner}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter number"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Inner Per Box <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="innerPerBox"
+              value={form.innerPerBox}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter number"
+            />
+          </div>
+          
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Boxes <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="boxes"
+              value={form.boxes}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter count"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Inners <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="inners"
+              value={form.inners}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter count"
+            />
+          </div>
+          
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Units <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="units"
+              value={form.units}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter count"
+            />
+          </div>
+        </div>
+
+        <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="font-medium text-gray-700">Stock On Hand</h3>
+              <p className="text-xs text-gray-500">Calculated automatically</p>
+            </div>
+            <div className="text-2xl font-bold text-blue-700">
+              {stockOnHand}
+            </div>
           </div>
         </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 font-semibold"
+          disabled={isSubmitting}
+          className={`w-full py-3 rounded-lg font-semibold transition-all ${
+            isSubmitting 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-md hover:shadow-lg'
+          }`}
         >
-          Add
+          {isSubmitting ? (
+            <div className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Processing...
+            </div>
+          ) : (
+            'Add Inventory Item'
+          )}
         </button>
       </form>
     </div>

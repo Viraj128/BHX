@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
 import { collection, getDocs, setDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import WasteLogHistory from './WasteLogHistory';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const getTimeOfDay = () => {
   const hour = new Date().getHours();
@@ -39,7 +41,7 @@ const WasteManagement = () => {
           return {
             id: docSnap.id,
             itemName: data.itemName || 'Unknown Item',
-            unit: 'EA',
+            unit: data.unit || '', // Fetch unit from Firebase
             boxes: '',
             innerPacks: '',
             units: '',
@@ -71,7 +73,6 @@ const WasteManagement = () => {
   useEffect(() => {
     fetchItemsData();
   }, []);
-
 
   const calculateWaste = (item) =>
     (item.boxes * item.innerPerBox * item.unitsPerInner) +
@@ -127,7 +128,7 @@ const WasteManagement = () => {
     const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')}`;
     const formattedTime = `${currentDate.getHours().toString().padStart(2, '0')}-${currentDate.getMinutes().toString().padStart(2, '0')}-${currentDate.getSeconds().toString().padStart(2, '0')}`;
     const logId = `${formattedDate}_${formattedTime}`;
-     const employeeID = getEmployeeId();
+    const employeeID = getEmployeeId();
 
     try {
       // Create waste log document
@@ -155,6 +156,7 @@ const WasteManagement = () => {
         wasteItemPromises.push(setDoc(wasteItemRef, {
           itemId: doc(db, `inventory/${item.id}`),
           itemName: item.itemName,
+          unit: item.unit, // Include unit in waste log
           boxesCount: item.boxes || 0,
           innerCount: item.innerPacks || 0,
           unitsCount: item.units || 0,
@@ -163,7 +165,7 @@ const WasteManagement = () => {
           datePerformed: currentDate.toISOString(),
           timestamp: currentDate.toISOString(),
           timeOfDay: timeOfDay,
-           employeeID: employeeID,
+          employeeID: employeeID,
         }));
 
         // Update inventory stock
@@ -213,8 +215,6 @@ const WasteManagement = () => {
     }
   };
 
-
-  if (loading) return <div className="p-4">Loading inventory data...</div>;
   if (showWasteLog) {
     return (
       <div className="flex-1 p-6 overflow-auto">
@@ -284,58 +284,74 @@ const WasteManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredItems.map(item => (
-              <tr key={item.id}>
-                <td className="p-3">{item.itemName}</td>
-                <td className="p-3">{item.unit}</td>
-                <td className="p-3">
-                  <input
-                    type="number"
-                    value={item.boxes}
-                    onChange={(e) => handleInputChange(item.id, 'boxes', e.target.value)}
-                    className="border rounded p-2 w-20"
-                  />
-                </td>
-                <td className="p-3">
-                  <input
-                    type="number"
-                    value={item.innerPacks}
-                    onChange={(e) => handleInputChange(item.id, 'innerPacks', e.target.value)}
-                    className="border rounded p-2 w-20"
-                  />
-                </td>
-                <td className="p-3">
-                  <input
-                    type="number"
-                    value={item.units}
-                    onChange={(e) => handleInputChange(item.id, 'units', e.target.value)}
-                    className="border rounded p-2 w-20"
-                  />
-                </td>
-                <td className="p-3">
-                  <select
-                    value={selectedReasons[item.id]}
-                    onChange={(e) => handleReasonChange(item.id, e.target.value)}
-                    className="border rounded p-2"
-                  >
-                    <option value="1 End of Night">1 End of Night</option>
-                    <option value="2.Food Donation">2.Food Donation</option>
-                    <option value="3 Customer Complaint">3 Customer Complaint</option>
-                    <option value="4 Damaged Stock">4 Damaged Stock</option>
-                    <option value="5 HACCP">5 HACCP</option>
-                    <option value="6 Out of Date">6 Out of Date</option>
-                    <option value="7 Expired">7 Expired</option>
-                  </select>
-                </td>
-                <td className="p-3">
-                  <input
-                    type="checkbox"
-                    checked={readyToAdjust[item.id]}
-                    onChange={() => handleReadyToAdjustChange(item.id)}
-                  />
-                </td>
-              </tr>
-            ))}
+            {loading ? (
+              <SkeletonTheme baseColor="#e5e7eb" highlightColor="#f3f4f6">
+                {[...Array(5)].map((_, index) => (
+                  <tr key={index}>
+                    <td className="p-3"><Skeleton width={150} height={20} /></td>
+                    <td className="p-3"><Skeleton width={50} height={20} /></td>
+                    <td className="p-3"><Skeleton width={80} height={20} /></td>
+                    <td className="p-3"><Skeleton width={80} height={20} /></td>
+                    <td className="p-3"><Skeleton width={80} height={20} /></td>
+                    <td className="p-3"><Skeleton width={120} height={20} /></td>
+                    <td className="p-3"><Skeleton width={20} height={20} /></td>
+                  </tr>
+                ))}
+              </SkeletonTheme>
+            ) : (
+              filteredItems.map(item => (
+                <tr key={item.id}>
+                  <td className="p-3">{item.itemName}</td>
+                  <td className="p-3">{item.unit || 'N/A'}</td>
+                  <td className="p-3">
+                    <input
+                      type="number"
+                      value={item.boxes}
+                      onChange={(e) => handleInputChange(item.id, 'boxes', e.target.value)}
+                      className="border rounded p-2 w-20"
+                    />
+                  </td>
+                  <td className="p-3">
+                    <input
+                      type="number"
+                      value={item.innerPacks}
+                      onChange={(e) => handleInputChange(item.id, 'innerPacks', e.target.value)}
+                      className="border rounded p-2 w-20"
+                    />
+                  </td>
+                  <td className="p-3">
+                    <input
+                      type="number"
+                      value={item.units}
+                      onChange={(e) => handleInputChange(item.id, 'units', e.target.value)}
+                      className="border rounded p-2 w-20"
+                    />
+                  </td>
+                  <td className="p-3">
+                    <select
+                      value={selectedReasons[item.id]}
+                      onChange={(e) => handleReasonChange(item.id, e.target.value)}
+                      className="border rounded p-2"
+                    >
+                      <option value="1 End of Night">1 End of Night</option>
+                      <option value="2.Food Donation">2.Food Donation</option>
+                      <option value="3 Customer Complaint">3 Customer Complaint</option>
+                      <option value="4 Damaged Stock">4 Damaged Stock</option>
+                      <option value="5 HACCP">5 HACCP</option>
+                      <option value="6 Out of Date">6 Out of Date</option>
+                      <option value="7 Expired">7 Expired</option>
+                    </select>
+                  </td>
+                  <td className="p-3">
+                    <input
+                      type="checkbox"
+                      checked={readyToAdjust[item.id]}
+                      onChange={() => handleReadyToAdjustChange(item.id)}
+                    />
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "target": "main-database2",
+    "public": "build",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
