@@ -24,7 +24,7 @@ const initialState = {
   },
   document_number: "",
   shareCode: "",
-  countryCode: "+91",
+  countryCode: "+44",
 };
 
 const AddUser = () => {
@@ -95,7 +95,7 @@ const AddUser = () => {
       return showError("Bank account number must be exactly 8 digits."), false;
     if (!/^\d{5}$/.test(formData.document_number))
       return showError("Document number must be exactly 5 digits."), false;
-    
+
     const shareCodeDigits = formData.shareCode.replace(/[^\d]/g, "");
     if (formData.shareCode && !/^\d{6}$/.test(shareCodeDigits))
       return showError("Share code must be exactly 6 digits."), false;
@@ -120,12 +120,12 @@ const AddUser = () => {
       userId = Math.floor(100000000 + Math.random() * 900000000).toString();
       const usersRef = doc(db, "users_01", userId);
       const customersRef = doc(db, "customers", userId);
-      
+
       const [userDoc, customerDoc] = await Promise.all([
         getDoc(usersRef),
         getDoc(customersRef)
       ]);
-      
+
       if (!userDoc.exists() && !customerDoc.exists()) {
         return userId;
       }
@@ -139,7 +139,7 @@ const AddUser = () => {
         getDoc(doc(db, "users_01", docId)),
         getDoc(doc(db, "customers", docId))
       ]);
-      
+
       if (usersDoc.exists() || customersDoc.exists()) {
         showError("A user with this phone number already exists.");
         return true;
@@ -147,7 +147,7 @@ const AddUser = () => {
 
       if (formData.email) {
         const emailQuery = query(
-          collection(db, "users_01"), 
+          collection(db, "users_01"),
           where("email", "==", formData.email)
         );
         const emailSnapshot = await getDocs(emailQuery);
@@ -205,7 +205,7 @@ const AddUser = () => {
     e.preventDefault();
     showError("");
     if (!validateForm()) return;
-    
+
     setLoading(true);
     const docId = formData.phone;
 
@@ -230,7 +230,7 @@ const AddUser = () => {
         member_since: new Date().toISOString(),
         created_at: Timestamp.now(),
         role: formData.role,
-        type: formData.role !== "customer" && { type: "employee" },
+        type: formData.role !== "customer" ? "employee" : "",
         bank_details: formData.bank_details,
         document_number: formData.document_number,
         shareCode: formData.shareCode,
@@ -297,7 +297,7 @@ const AddUser = () => {
 
       <h2 className="text-3xl font-bold text-gray-800 mb-6">Add User</h2>
       {error && <p className="text-red-500 bg-red-100 p-3 rounded-md mb-4">{error}</p>}
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Full Name */}
@@ -317,14 +317,17 @@ const AddUser = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
             <div className="flex">
-              <select
+              {/* <select
                 name="countryCode"
                 value={formData.countryCode}
                 onChange={handleChange}
                 className="w-1/4 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="+44">+44 (UK)</option>
-              </select>
+              </select> */}
+              <span className="px-3 py-2 border border-gray-300 bg-gray-100 rounded-l-md text-gray-700 flex items-center">
+                +44
+              </span>
               <input
                 type="tel"
                 name="phone"
@@ -406,9 +409,9 @@ const AddUser = () => {
           {/* Role */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-            <select 
-              name="role" 
-              value={formData.role} 
+            <select
+              name="role"
+              value={formData.role}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -488,12 +491,11 @@ const AddUser = () => {
         </div>
 
         <div className="mt-8">
-          <button 
+          <button
             type="submit"
             disabled={loading}
-            className={`w-full md:w-auto px-6 py-3 text-white rounded-md transition-colors flex items-center justify-center ${
-              loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            className={`w-full md:w-auto px-6 py-3 text-white rounded-md transition-colors flex items-center justify-center ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+              }`}
           >
             {loading ? (
               <>

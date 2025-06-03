@@ -182,6 +182,12 @@ const Addinventory = () => {
 
   return (
     <div className="max-w-xl mx-auto mt-8 md:mt-16 p-6 md:p-8 bg-white border border-gray-200 rounded-2xl shadow-xl">
+      <button
+        className="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-green-700 transition-colors mb-6"
+        onClick={() => navigate("/inventory/inventoryrecords")}
+      >
+        Back to Users
+      </button>
       <div className="mb-6 text-center">
         <h2 className="text-2xl font-bold text-gray-800">Add New Inventory</h2>
         <p className="text-gray-600 mt-2">Fill in the details to add a new inventory item</p>

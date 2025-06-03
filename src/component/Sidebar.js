@@ -129,14 +129,12 @@ const Sidebar = () => {
                   >
                     Stock Movement
                   </button>
-                  {(isAdmin) && (
                     <button
                       className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                       onClick={() => navigate('/inventory/inventoryrecords')}
                     >
                       Inventory Records
                     </button>
-                  )}
                 </div>
               )}
             </div>
@@ -174,29 +172,35 @@ const Sidebar = () => {
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-                onClick={() => toggleSection('itemsManagement')}
+                onClick={() => toggleSection('itemsmanagement')}
               >
                 <span>Items Management</span>
-                {openSection === 'itemsManagement' ? (
+                {openSection === 'itemsmanagement' ? (
                   <ChevronDownIcon className="h-4 w-4" />
                 ) : (
                   <ChevronRightIcon className="h-4 w-4" />
                 )}
               </button>
 
-              {openSection === 'itemsManagement' && (
+              {openSection === 'itemsmanagement' && (
                 <div className="ml-4 space-y-1">
                   <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/items-management/categories')}
+                    onClick={() => navigate('/itemsmanagement/categories')}
                   >
                     Categories
                   </button>
                   <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/items-management/items')}
+                    onClick={() => navigate('/itemsmanagement/items')}
                   >
                     Items
+                  </button>
+                   <button
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/itemsmanagement/sauces')}
+                  >
+                    Sauces
                   </button>
                 </div>
               )}

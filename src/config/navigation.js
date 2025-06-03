@@ -62,5 +62,28 @@ export const NAV_ITEMS = [
     ],
     // Only show the Inventory section for these roles
     roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
+  },
+   {
+    // ItemsManagement is a collapsible section with sub-items, only for Admin
+    label: 'itemsmanagement',
+    subItems: [
+      { 
+        label: 'Categories',
+        path: PATHS.CATEGORIES,
+        roles: [ROLES.ADMIN , ROLES.MANAGER, ROLES.TEAMLEADER]
+      },
+      {  
+        label: 'Items',
+        path: PATHS.ITEMS,
+        roles: [ROLES.ADMIN , ROLES.MANAGER, ROLES.TEAMLEADER]
+      },
+      {
+        label: 'Sauces',
+        path: PATHS.SAUCES,
+        roles: [ROLES.ADMIN , ROLES.MANAGER, ROLES.TEAMLEADER]
+      }
+    ],
+    // Only show the ItemsManagement section for these roles
+    roles: [ROLES.ADMIN , ROLES.MANAGER, ROLES.TEAMLEADER]
   }
 ];

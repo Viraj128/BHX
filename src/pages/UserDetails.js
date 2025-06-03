@@ -258,221 +258,227 @@ const UserDetails = () => {
     setFormData({ ...formData, shareCode: formatted });
     setError('');
   };
+const handleSave = async () => {
+  try {
+    const requiredFields = {
+      name: 'Name is required',
+      email: 'Email is required',
+      phone: 'Phone number is required',
+      role: 'Role is required'
+    };
 
-  const handleSave = async () => {
-    try {
-      const requiredFields = {
-        name: 'Name is required',
-        email: 'Email is required',
-        phone: 'Phone number is required',
-        role: 'Role is required'
-      };
-
-      for (const [field, message] of Object.entries(requiredFields)) {
-        if (!formData[field]) {
-          setError(message);
-          return;
-        }
-      }
-
-      if (!/^[A-Za-z\s]+$/.test(formData.name)) {
-        setError('Full Name should only contain alphabets and spaces.');
+    for (const [field, message] of Object.entries(requiredFields)) {
+      if (!formData[field]) {
+        setError(message);
         return;
       }
-
-      if (!/^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com)$/.test(formData.email)) {
-        setError('Invalid email format');
-        return;
-      }
-
-      if (formData.role === 'customer' && !formData.customerID) {
-        setError('Customer ID is required');
-        return;
-      }
-
-      if (formData.role !== 'customer' && formData.employeeID) {
-        const empIdQuery = query(
-          collection(db, 'users_01'),
-          where('employeeID', '==', formData.employeeID)
-        );
-        const empIdSnapshot = await getDocs(empIdQuery);
-        if (
-          !empIdSnapshot.empty &&
-          empIdSnapshot.docs.some(docSnap => docSnap.id !== formData.phone)
-        ) {
-          setError('This Employee ID is already in use by another user.');
-          return;
-        }
-      }
-
-      await Promise.all([
-        getDoc(doc(db, 'customers', formData.phone)),
-        getDoc(doc(db, 'users_01', formData.phone))
-      ]);
-
-      if (formData.document_number && !/^\d{5}$/.test(formData.document_number)) {
-        setError('Document Number must be exactly 5 digits.');
-        return;
-      }
-
-      if (formData.bank_details.bank_name && !/^[a-zA-Z\s]+$/.test(formData.bank_details.bank_name)) {
-        setError('Bank Name can only contain alphabets and spaces.');
-        return;
-      }
-
-      if (formData.bank_details.branch_name && !/^[a-zA-Z\s]+$/.test(formData.bank_details.branch_name)) {
-        setError('Branch Name can only contain alphabets and spaces.');
-        return;
-      }
-
-      if (formData.dob) {
-        const dobDate = new Date(formData.dob);
-        const today = new Date();
-        if (dobDate > today) {
-          setError('Date of Birth cannot be in the future');
-          return;
-        }
-        const dobYear = dobDate.getFullYear();
-        if (dobYear > 2001) {
-          setError('Date of Birth year must be 2001 or earlier.');
-          return;
-        }
-      }
-
-      if (formData.shareCode && !/^\d{2}\/\d{2}\/\d{2}$/.test(formData.shareCode)) {
-        setError('Share Code must be in the format __/__/__ (e.g., 12/34/56).');
-        return;
-      }
-
-      if (formData.bank_details.account_number && !/^\d{8}$/.test(formData.bank_details.account_number)) {
-        setError('Account Number must be exactly 8 digits.');
-        return;
-      }
-
-      if (formData.address && formData.address.toLowerCase() === 'none') {
-        setError('Address cannot be "none"');
-        return;
-      }
-
-      if (formData.phone !== user.phone) {
-        setNewPhoneNumber(formData.phone);
-        setIsPhoneChangeAlertOpen(true);
-        return;
-      }
-
-      const isEmailChanged = formData.email !== user.email;
-
-      const [customerDoc, employeeDoc] = await Promise.all([
-        getDoc(doc(db, 'customers', formData.phone)),
-        getDoc(doc(db, 'users_01', formData.phone))
-      ]);
-
-      const updates = [];
-      let employeeChanges = [];
-      let isConvertingToCustomer = false;
-
-      const commonData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        dob: formData.dob,
-        document_number: formData.document_number,
-        bank_details: formData.bank_details,
-        member_since: formData.member_since || new Date().toISOString(),
-        shareCode: formData.shareCode,
-        updatedAt: new Date(),
-        userId: formData.userId,
-        emailVerified: false,
-      };
-
-      if (customerDoc.exists()) {
-        const existingCustomerData = customerDoc.data();
-        const customerUpdate = {
-          ...commonData,
-          role: 'customer',
-          customerID: formData.role === 'customer' ? formData.customerID : existingCustomerData.customerID
-        };
-        delete customerUpdate.employeeID;
-        delete customerUpdate.changeField;
-
-        updates.push(updateDoc(doc(db, 'customers', formData.phone), customerUpdate));
-      }
-
-      if (employeeDoc.exists()) {
-        const existingEmployeeData = employeeDoc.data();
-        const employeeUpdate = {
-          ...commonData,
-          role: formData.role !== 'customer' ? formData.role : existingEmployeeData.role,
-          employeeID: formData.role !== 'customer' ? formData.employeeID : existingEmployeeData.employeeID
-        };
-
-        employeeChanges = trackEmployeeChanges(existingEmployeeData, employeeUpdate);
-        if (employeeChanges.length > 0) {
-          employeeUpdate.changeField = arrayUnion(...employeeChanges);
-        }
-
-        updates.push(updateDoc(doc(db, 'users_01', formData.phone), employeeUpdate));
-      }
-
-      if (!customerDoc.exists() && formData.role === 'customer') {
-        const customerData = {
-          ...commonData,
-          role: 'customer',
-          customerID: formData.customerID
-        };
-        delete customerData.employeeID;
-        delete customerData.changeField;
-
-        updates.push(setDoc(doc(db, 'customers', formData.phone), customerData));
-      }
-
-      if (!employeeDoc.exists() && formData.role !== 'customer') {
-        const employeeData = {
-          ...commonData,
-          role: 'customer',
-          employeeID: formData.employeeID,
-          changeField: arrayUnion(...trackEmployeeChanges({}, formData))
-        };
-
-        updates.push(setDoc(doc(db, 'users_01', formData.phone), employeeData));
-      }
-
-      if (formData.role === 'customer' && employeeDoc?.exists()) {
-        updates.push(
-          updateDoc(doc(db, 'users_01', formData.phone), {
-            originalRole: employeeDoc.data().role
-          })
-        );
-        isConvertingToCustomer = true;
-      }
-
-      if (formData.role !== 'customer' && customerDoc?.exists()) {
-        updates.push(
-          updateDoc(doc(db, 'customers', formData.phone), {
-            status: 'converted-to-employee',
-            convertedAt: new Date()
-          })
-        );
-      }
-
-      await Promise.all(updates);
-
-      setUser(prev => ({
-        ...prev,
-        ...formData,
-        changeField: employeeDoc.exists() ? [...(prev.changeField || []), ...employeeChanges] : prev.changeField || [],
-        originalRole: isConvertingToCustomer ? employeeDoc.data().role : prev.originalRole
-      }));
-
-      setSuccessMessage('User updated successfully!');
-      setTimeout(() => navigate('/users'), 1000);
-    } catch (err) {
-      console.error('Update error:', err);
-      setError(`Failed to update user: ${err.message}`);
     }
-  };
 
+    if (!/^[A-Za-z\s]+$/.test(formData.name)) {
+      setError('Full Name should only contain alphabets and spaces.');
+      return;
+    }
+
+    if (!/^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com)$/.test(formData.email)) {
+      setError('Invalid email format');
+      return;
+    }
+
+    if (formData.role === 'customer' && !formData.customerID) {
+      setError('Customer ID is required');
+      return;
+    }
+
+    if (formData.role !== 'customer' && formData.employeeID) {
+      const empIdQuery = query(
+        collection(db, 'users_01'),
+        where('employeeID', '==', formData.employeeID)
+      );
+      const empIdSnapshot = await getDocs(empIdQuery);
+      if (
+        !empIdSnapshot.empty &&
+        empIdSnapshot.docs.some(docSnap => docSnap.id !== formData.phone)
+      ) {
+        setError('This Employee ID is already in use by another user.');
+        return;
+      }
+    }
+
+    await Promise.all([
+      getDoc(doc(db, 'customers', formData.phone)),
+      getDoc(doc(db, 'users_01', formData.phone))
+    ]);
+
+    if (formData.document_number && !/^\d{5}$/.test(formData.document_number)) {
+      setError('Document Number must be exactly 5 digits.');
+      return;
+    }
+
+    if (formData.bank_details.bank_name && !/^[a-zA-Z\s]+$/.test(formData.bank_details.bank_name)) {
+      setError('Bank Name can only contain alphabets and spaces.');
+      return;
+    }
+
+    if (formData.bank_details.branch_name && !/^[a-zA-Z\s]+$/.test(formData.bank_details.branch_name)) {
+      setError('Branch Name can only contain alphabets and spaces.');
+      return;
+    }
+
+    if (formData.dob) {
+      const dobDate = new Date(formData.dob);
+      const today = new Date();
+      if (dobDate > today) {
+        setError('Date of Birth cannot be in the future');
+        return;
+      }
+      const dobYear = dobDate.getFullYear();
+      if (dobYear > 2001) {
+        setError('Date of Birth year must be 2001 or earlier.');
+        return;
+      }
+    }
+
+    if (formData.shareCode && !/^\d{2}\/\d{2}\/\d{2}$/.test(formData.shareCode)) {
+      setError('Share Code must be in the format __/__/__ (e.g., 12/34/56).');
+      return;
+    }
+
+    if (formData.bank_details.account_number && !/^\d{8}$/.test(formData.bank_details.account_number)) {
+      setError('Account Number must be exactly 8 digits.');
+      return;
+    }
+
+    if (formData.address && formData.address.toLowerCase() === 'none') {
+      setError('Address cannot be "none"');
+      return;
+    }
+
+    if (formData.phone !== user.phone) {
+      setNewPhoneNumber(formData.phone);
+      setIsPhoneChangeAlertOpen(true);
+      return;
+    }
+
+    const isEmailChanged = formData.email !== user.email;
+
+    const [customerDoc, employeeDoc] = await Promise.all([
+      getDoc(doc(db, 'customers', formData.phone)),
+      getDoc(doc(db, 'users_01', formData.phone))
+    ]);
+
+    const updates = [];
+    let employeeChanges = [];
+    let isConvertingToCustomer = false;
+
+    const commonData = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+      dob: formData.dob,
+      document_number: formData.document_number,
+      bank_details: formData.bank_details,
+      member_since: formData.member_since || new Date().toISOString(),
+      shareCode: formData.shareCode,
+      updatedAt: new Date(),
+      userId: formData.userId,
+      emailVerified: false,
+    };
+
+    if (customerDoc.exists()) {
+      const existingCustomerData = customerDoc.data();
+      const customerUpdate = {
+        ...commonData,
+        role: 'customer',
+        customerID: formData.role === 'customer' ? formData.customerID : existingCustomerData.customerID,
+      };
+      delete customerUpdate.employeeID;
+      delete customerUpdate.changeField;
+      delete customerUpdate.type; // Remove type for customers
+      delete customerUpdate.active; // Remove active for customers
+
+      updates.push(updateDoc(doc(db, 'customers', formData.phone), customerUpdate));
+    }
+
+    if (employeeDoc.exists()) {
+      const existingEmployeeData = employeeDoc.data();
+      const employeeUpdate = {
+        ...commonData,
+        role: formData.role !== 'customer' ? formData.role : existingEmployeeData.role,
+        employeeID: formData.role !== 'customer' ? formData.employeeID : existingEmployeeData.employeeID,
+        type: 'employee', // Set type explicitly for employees
+        active: true // Set active explicitly for employees
+      };
+
+      employeeChanges = trackEmployeeChanges(existingEmployeeData, employeeUpdate);
+      if (employeeChanges.length > 0) {
+        employeeUpdate.changeField = arrayUnion(...employeeChanges);
+      }
+
+      updates.push(updateDoc(doc(db, 'users_01', formData.phone), employeeUpdate));
+    }
+
+    if (!customerDoc.exists() && formData.role === 'customer') {
+      const customerData = {
+        ...commonData,
+        role: 'customer',
+        customerID: formData.customerID
+      };
+      delete customerData.employeeID;
+      delete customerData.changeField;
+      delete customerData.type; // Remove type for customers
+      delete customerData.active; // Remove active for customers
+
+      updates.push(setDoc(doc(db, 'customers', formData.phone), customerData));
+    }
+
+    if (!employeeDoc.exists() && formData.role !== 'customer') {
+      const employeeData = {
+        ...commonData,
+        role: formData.role, // Fix: Use the intended role
+        employeeID: formData.employeeID,
+        type: 'employee', // Add type for new employees
+        active: true, // Add active for new employees
+        changeField: arrayUnion(...trackEmployeeChanges({}, formData))
+      };
+
+      updates.push(setDoc(doc(db, 'users_01', formData.phone), employeeData));
+    }
+
+    if (formData.role === 'customer' && employeeDoc?.exists()) {
+      updates.push(
+        updateDoc(doc(db, 'users_01', formData.phone), {
+          originalRole: employeeDoc.data().role
+        })
+      );
+      isConvertingToCustomer = true;
+    }
+
+    if (formData.role !== 'customer' && customerDoc?.exists()) {
+      updates.push(
+        updateDoc(doc(db, 'customers', formData.phone), {
+          status: 'converted-to-employee',
+          convertedAt: new Date()
+        })
+      );
+    }
+
+    await Promise.all(updates);
+
+    setUser(prev => ({
+      ...prev,
+      ...formData,
+      changeField: employeeDoc.exists() ? [...(prev.changeField || []), ...employeeChanges] : prev.changeField || [],
+      originalRole: isConvertingToCustomer ? employeeDoc.data().role : prev.originalRole
+    }));
+
+    setSuccessMessage('User updated successfully!');
+    setTimeout(() => navigate('/users'), 1000);
+  } catch (err) {
+    console.error('Update error:', err);
+    setError(`Failed to update user: ${err.message}`);
+  }
+};
   const ChangeAwareDisplay = ({ field, value, changes }) => {
     if (!changes || changes.length === 0) return <span>{displayValue(value)}</span>;
 

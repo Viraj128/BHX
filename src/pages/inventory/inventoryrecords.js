@@ -2,8 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { collection, getDocs, doc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext'; // Import useAuth
+import { ROLES } from '../../config/roles'; // Import ROLES
 
 const InventoryRecords = () => {
+  const { user } = useAuth(); // Get current user from AuthContext
+  const navigate = useNavigate();
+
+  // Role checks using ROLES constants
+  const isAdmin = user?.role === ROLES.ADMIN;
+  const isManager = user?.role === ROLES.MANAGER;
+  const isTeamLeader = user?.role === ROLES.TEAMLEADER;
+  const isTeamMember = user?.role === ROLES.TEAMMEMBER;
+
   const [inventory, setInventory] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingRowId, setEditingRowId] = useState(null);
@@ -13,7 +24,13 @@ const InventoryRecords = () => {
   const [showStockPrompt, setShowStockPrompt] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+
+  // Redirect Team Members to unauthorized page
+  useEffect(() => {
+    if (isTeamMember) {
+      navigate('/unauthorized', { replace: true });
+    }
+  }, [isTeamMember, navigate]);
 
   useEffect(() => {
     const fetchInventory = async () => {
@@ -73,7 +90,8 @@ const InventoryRecords = () => {
   const filteredInventory = inventory.filter(item =>
     Object.values(item).some(value =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
-  ));
+    )
+  );
 
   const isNumeric = (val) => /^[0-9\b]+$/.test(val) || val === '';
 
@@ -107,6 +125,10 @@ const InventoryRecords = () => {
   };
 
   const handleSave = async (itemId) => {
+    if (!isAdmin) {
+      alert('You do not have permission to edit inventory.');
+      return;
+    }
     try {
       const oldItem = inventory.find(item => item.id === itemId);
       const duplicateItem = inventory.find(item =>
@@ -166,6 +188,10 @@ const InventoryRecords = () => {
   };
 
   const handleDelete = async (itemId) => {
+    if (!isAdmin) {
+      alert('You do not have permission to delete inventory.');
+      return;
+    }
     const confirmDelete = window.confirm('Are you sure you want to delete this record?');
     if (!confirmDelete) return;
     try {
@@ -219,15 +245,17 @@ const InventoryRecords = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 bg-white p-6 rounded-lg shadow">
-          <button
-            onClick={() => navigate('/inventory/addinventory')}
-            className="bg-emerald-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-emerald-700 transition duration-300 flex items-center mb-4 md:mb-0"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-            Add Inventory
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => navigate('/inventory/addinventory')}
+              className="bg-emerald-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-emerald-700 transition duration-300 flex items-center mb-4 md:mb-0"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              </svg>
+              Add Inventory
+            </button>
+          )}
           
           <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Inventory Records</h1>
           
@@ -252,7 +280,7 @@ const InventoryRecords = () => {
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743- glaucoma2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
@@ -262,7 +290,7 @@ const InventoryRecords = () => {
           </div>
         )}
 
-        {showStockPrompt && (
+        {showStockPrompt && isAdmin && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl shadow-xl w-96">
               <h2 className="text-xl font-bold mb-4 text-gray-800">Update Stock Levels</h2>
@@ -314,11 +342,7 @@ const InventoryRecords = () => {
                   >
                     <div className="flex items-center">
                       Item ID
-                      {sortConfig.key === 'itemId' && (
-                        <span className="ml-1">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
-                      )}
+                      {renderSortArrow('itemId')}
                     </div>
                   </th>
                   <th
@@ -327,11 +351,7 @@ const InventoryRecords = () => {
                   >
                     <div className="flex items-center">
                       Item Name
-                      {sortConfig.key === 'itemName' && (
-                        <span className="ml-1">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
-                      )}
+                      {renderSortArrow('itemName')}
                     </div>
                   </th>
                   <th
@@ -340,11 +360,7 @@ const InventoryRecords = () => {
                   >
                     <div className="flex items-center">
                       Units/Inner
-                      {sortConfig.key === 'unitsPerInner' && (
-                        <span className="ml-1">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
-                      )}
+                      {renderSortArrow('unitsPerInner')}
                     </div>
                   </th>
                   <th
@@ -353,11 +369,7 @@ const InventoryRecords = () => {
                   >
                     <div className="flex items-center">
                       Inner/Box
-                      {sortConfig.key === 'innerPerBox' && (
-                        <span className="ml-1">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
-                      )}
+                      {renderSortArrow('innerPerBox')}
                     </div>
                   </th>
                   <th
@@ -366,11 +378,7 @@ const InventoryRecords = () => {
                   >
                     <div className="flex items-center">
                       Total Stock
-                      {sortConfig.key === 'totalStockOnHand' && (
-                        <span className="ml-1">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
-                      )}
+                      {renderSortArrow('totalStockOnHand')}
                     </div>
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
@@ -399,6 +407,7 @@ const InventoryRecords = () => {
                             value={editedItem.itemId || ''}
                             onChange={(e) => handleInputChange(e, 'itemId')}
                             className="w-full px-3 py-1 border rounded-md focus:ring-2 focus:ring-blue-500"
+                            disabled={!isAdmin} // Disable input for non-admins
                           />
                         ) : (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -413,6 +422,7 @@ const InventoryRecords = () => {
                             value={editedItem.itemName || ''}
                             onChange={(e) => handleInputChange(e, 'itemName')}
                             className="w-full px-3 py-1 border rounded-md focus:ring-2 focus:ring-blue-500"
+                            disabled={!isAdmin} // Disable input for non-admins
                           />
                         ) : (
                           item.itemName || 'N/A'
@@ -425,6 +435,7 @@ const InventoryRecords = () => {
                             value={editedItem.unitsPerInner || ''}
                             onChange={(e) => handleInputChange(e, 'unitsPerInner')}
                             className="w-full px-3 py-1 border rounded-md focus:ring-2 focus:ring-blue-500"
+                            disabled={!isAdmin} // Disable input for non-admins
                           />
                         ) : (
                           item.unitsPerInner || 'N/A'
@@ -437,6 +448,7 @@ const InventoryRecords = () => {
                             value={editedItem.innerPerBox || ''}
                             onChange={(e) => handleInputChange(e, 'innerPerBox')}
                             className="w-full px-3 py-1 border rounded-md focus:ring-2 focus:ring-blue-500"
+                            disabled={!isAdmin} // Disable input for non-admins
                           />
                         ) : (
                           item.innerPerBox || 'N/A'
@@ -454,7 +466,10 @@ const InventoryRecords = () => {
                             />
                             <button
                               onClick={() => setShowStockPrompt(true)}
-                              className="ml-2 px-2 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center text-sm"
+                              className={`ml-2 px-2 py-1 text-white rounded-md flex items-center text-sm ${
+                                isAdmin ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-400 cursor-not-allowed'
+                              }`}
+                              disabled={!isAdmin} // Disable stock edit button for non-admins
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -477,7 +492,10 @@ const InventoryRecords = () => {
                             <>
                               <button
                                 onClick={() => handleSave(item.id)}
-                                className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition flex items-center"
+                                className={`px-3 py-1 text-white rounded-md flex items-center transition ${
+                                  isAdmin ? 'bg-green-600 hover:bg-green-700' : 'bg-green-400 cursor-not-allowed'
+                                }`}
+                                disabled={!isAdmin} // Disable Save button for non-admins
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -508,7 +526,10 @@ const InventoryRecords = () => {
                                     totalStockOnHand: item.totalStockOnHand || '',
                                   });
                                 }}
-                                className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center"
+                                className={`px-3 py-1 text-white rounded-md flex items-center transition ${
+                                  isAdmin ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-400 cursor-not-allowed'
+                                }`}
+                                disabled={!isAdmin} // Disable Edit button for non-admins
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                   <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -517,7 +538,10 @@ const InventoryRecords = () => {
                               </button>
                               <button
                                 onClick={() => handleDelete(item.id)}
-                                className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition flex items-center"
+                                className={`px-3 py-1 text-white rounded-md flex items-center transition ${
+                                  isAdmin ? 'bg-red-600 hover:bg-red-700' : 'bg-red-400 cursor-not-allowed'
+                                }`}
+                                disabled={!isAdmin} // Disable Delete button for non-admins
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                   <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />

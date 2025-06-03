@@ -4,8 +4,8 @@ import { collection, getDocs, query } from "firebase/firestore";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { ROLES } from "../config/roles";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton"; // Import Skeleton
-import "react-loading-skeleton/dist/skeleton.css"; // Import Skeleton CSS
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const Users = () => {
   const { user } = useAuth();
@@ -158,11 +158,13 @@ const Users = () => {
     const filteredTeamMems = visibleTeamMembers.filter((userData) => {
       if (userTypeFilter === "customers") return false;
 
+      const fullPhone = `${userData.countryCode} ${userData.phone}`.toLowerCase();
       const matchesSearch = [
         userData.name.toLowerCase(),
         userData.phone.toLowerCase(),
         userData.userId.toLowerCase(),
         userData.role.toLowerCase(),
+        fullPhone, // Include country code + phone in search
       ].some((field) => field.includes(search));
 
       const matchesRole =
@@ -177,10 +179,12 @@ const Users = () => {
       ? customers.filter((customer) => {
           if (userTypeFilter === "teammembers") return false;
 
+          const fullPhone = `${customer.countryCode} ${customer.phone}`.toLowerCase();
           return [
             customer.name.toLowerCase(),
             customer.phone.toLowerCase(),
             customer.userId.toLowerCase(),
+            fullPhone, // Include country code + phone in search
           ].some((field) => field.includes(search));
         })
       : [];
@@ -192,6 +196,12 @@ const Users = () => {
         const aDate = a.member_since ? new Date(a.member_since) : new Date(0);
         const bDate = b.member_since ? new Date(b.member_since) : new Date(0);
         return (aDate - bDate) * direction;
+      }
+      if (sortConfig.key === "phone") {
+        // Combine countryCode and phone for sorting
+        const aPhone = `${a.countryCode}${a.phone}`.toLowerCase();
+        const bPhone = `${b.countryCode}${b.phone}`.toLowerCase();
+        return aPhone.localeCompare(bPhone) * direction;
       }
       const aValue =
         (typeof a[sortConfig.key] === "string"
@@ -211,6 +221,12 @@ const Users = () => {
         const aDate = a.member_since ? new Date(a.member_since) : new Date(0);
         const bDate = b.member_since ? new Date(b.member_since) : new Date(0);
         return (aDate - bDate) * direction;
+      }
+      if (sortConfig.key === "phone") {
+        // Combine countryCode and phone for sorting
+        const aPhone = `${a.countryCode}${a.phone}`.toLowerCase();
+        const bPhone = `${b.countryCode}${b.phone}`.toLowerCase();
+        return aPhone.localeCompare(bPhone) * direction;
       }
       const aValue =
         (typeof a[sortConfig.key] === "string"
@@ -429,7 +445,7 @@ const Users = () => {
               type="text"
               id="search"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search across all users..."
+              placeholder="Search by name, phone, country code, or user ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -459,6 +475,8 @@ const Users = () => {
                             ? "User ID"
                             : column === "member_since"
                             ? "Date of Joining"
+                            : column === "phone"
+                            ? "Phone Number"
                             : column.charAt(0).toUpperCase() + column.slice(1)}
                           {renderSortArrow(column)}
                         </div>
@@ -536,8 +554,8 @@ const Users = () => {
                       <div className="flex items-center">
                         {column === "userId"
                           ? "User ID"
-                          : column === "member_since"
-                          ? "Date of Joining"
+                          : column === "phone"
+                          ? "Phone Number"
                           : column.charAt(0).toUpperCase() + column.slice(1)}
                         {renderSortArrow(column)}
                       </div>

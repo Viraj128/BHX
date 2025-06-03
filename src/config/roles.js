@@ -18,6 +18,9 @@ export const PATHS = {
   INVENTORY_RECORDS: '/inventory/inventoryrecords',
   STOCK_MOVEMENT: '/inventory/stock-movement',
   VIEWDETAILS: '/viewDetails',
+  CATEGORIES : '/itemsmanagement/categories',
+  ITEMS : '/itemsmanagement/items',
+  SAUCES : '/itemsmanagement/sauces'
 };
 
 // Utility function to return the dashboard path.
