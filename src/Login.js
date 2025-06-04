@@ -53,30 +53,60 @@ const Login = () => {
     }
   };
 
-  const handleOtpSubmit = async (e) => {
-    e.preventDefault();
-    if (!otp) {
-      setError("Please enter OTP");
-      return;
-    }
+  // const handleOtpSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!otp) {
+  //     setError("Please enter OTP");
+  //     return;
+  //   }
 
-    setLoading(true);
-    setError("");
+  //   setLoading(true);
+  //   setError("");
 
-    try {
-      if (otp === userData.otp.toString()) {
-        await login({
-          ...userData,
-          loginTimestamp: Date.now() // Add login timestamp
-        });
-        navigate(getDashboardPath(), { replace: true }); // Replace history
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  //   try {
+  //     if (otp === userData.otp.toString()) {
+  //       await login({
+  //         ...userData,
+  //         loginTimestamp: Date.now() // Add login timestamp
+  //       });
+  //       navigate(getDashboardPath(), { replace: true }); // Replace history
+  //     }
+  //   } catch (err) {
+  //     setError(err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+//HERE ARE CHANGES IN OTP SUBMIT:
+const handleOtpSubmit = async (e) => {
+  e.preventDefault();
+  if (!otp) {
+    setError("Please enter OTP");
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+
+  try {
+    // Your custom OTP verification logic
+    if (otp === userData.otp.toString()) {
+      // Now, call the `login` function from AuthContext with the *verified* userData
+      // The `userData` state already holds the data fetched from Firestore.
+      await login({
+        ...userData, // Pass the existing userData object
+        loginTimestamp: Date.now() // Add any extra info you need
+      });
+      navigate(getDashboardPath(), { replace: true });
+    } else {
+      throw new Error("Invalid OTP"); // If custom OTP doesn't match
     }
-  };
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
