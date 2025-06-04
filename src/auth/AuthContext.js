@@ -140,6 +140,7 @@
 //       phone: userData.phone,
 //       role: userData.role,
 //       sessionId: sessionId,
+//        loginTimestamp: Date.now(),
 //     };
 
 //     // Set user state
@@ -448,23 +449,23 @@ export function AuthProvider({ children }) {
   // If you are relying purely on your custom OTP and not doing `signInWithCustomToken`,
   // this listener will likely set the user to null eventually unless you trigger
   // a Firebase Auth state change via a custom token.
+ // Firebase Auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // If Firebase Auth detects a user (e.g., from a successful signInWithCustomToken or previous session)
-        // We still fetch user data from Firestore to populate our `user` context.
+        // Firebase user is authenticated
         const sessionId = generateSessionId();
         sessionIdRef.current = sessionId;
 
         try {
-          const userRef = doc(db, 'users_01', firebaseUser.uid); // Assuming 'users_01' uses UID as doc ID
+          const userRef = doc(db, 'users_01', firebaseUser.uid);
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
             const userData = userDoc.data();
             const authUser = {
               uid: firebaseUser.uid,
-              email: firebaseUser.email, // May be null if only phone auth
-              phone: userData.phone, // Assuming phone is stored in Firestore
+              email: firebaseUser.email, // May be null if phone auth
+              phone: userData.phone,
               name: userData.name,
               employeeID: userData.employeeID,
               role: userData.role,
@@ -475,24 +476,29 @@ export function AuthProvider({ children }) {
             setUser(authUser);
             setSessionActive(true);
 
+            // Store in localStorage
             localStorage.setItem('user', JSON.stringify(authUser));
             localStorage.setItem('sessionTimestamp', Date.now().toString());
             localStorage.setItem('sessionId', sessionId);
 
             // Log login to Firestore
             try {
-              const sessionRef = doc(db, 'userSessions', authUser.uid); // Use UID from Firestore
-              await setDoc(sessionRef, {
-                name: authUser.name,
-                phone: authUser.phone,
-                employeeID: authUser.employeeID,
-                sessions: {
-                  [sessionId]: {
-                    loginTime: serverTimestamp(),
-                    logoutTime: null,
+              const sessionRef = doc(db, 'userSessions', authUser.uid);
+              await setDoc(
+                sessionRef,
+                {
+                  name: authUser.name,
+                  phone: authUser.phone,
+                  employeeID: authUser.employeeID,
+                  sessions: {
+                    [sessionId]: {
+                      loginTime: serverTimestamp(),
+                      logoutTime: null,
+                    },
                   },
                 },
-              }, { merge: true });
+                { merge: true }
+              );
             } catch (error) {
               console.error('Error logging login time via onAuthStateChanged:', error);
             }
@@ -511,33 +517,36 @@ export function AuthProvider({ children }) {
           clearSessionData();
         }
       } else {
-        // No Firebase Auth user detected.
-        // Check if there's a user in localStorage (from a custom login that bypassed Firebase Auth directly)
-        const storedUser = localStorage.getItem('user');
-        const storedSessionTimestamp = localStorage.getItem('sessionTimestamp');
-        const storedSessionId = localStorage.getItem('sessionId');
+        // No Firebase Auth user; check localStorage for session restoration
+        try {
+          const storedUser = localStorage.getItem('user');
+          const sessionTimestamp = localStorage.getItem('sessionTimestamp');
+          const storedSessionId = localStorage.getItem('sessionId');
 
-        if (storedUser && storedSessionTimestamp && storedSessionId) {
-            const parsedUser = JSON.parse(storedUser);
-            // Optional: Re-validate against Firestore here if you want to be extra sure
-            // This is where you might set `user` and `sessionActive` based on your custom logic
-            // However, this means `onAuthStateChanged` is no longer the single source of truth,
-            // which complicates things and makes Firebase Auth less effective.
-            // For Path A, this useEffect will mainly just manage the *Firebase Auth* state.
-            // Your custom `login` function below will handle setting the user.
+          if (storedUser && sessionTimestamp && storedSessionId) {
+            const timeElapsed = Date.now() - parseInt(sessionTimestamp, 10);
+            if (timeElapsed < SESSION_TIMEOUT) {
+              const parsedUser = JSON.parse(storedUser);
+              setUser(parsedUser);
+              setSessionActive(true);
+              sessionIdRef.current = storedSessionId;
+            } else {
+              console.log('Session expired in localStorage');
+              clearSessionData();
+            }
+          } else {
+            clearSessionData();
+          }
+        } catch (error) {
+          console.error('Error restoring session from localStorage:', error);
+          clearSessionData();
         }
-
-        setUser(null);
-        setSessionActive(false);
-        clearSessionData();
       }
       setInitializing(false);
     });
 
     return () => unsubscribe();
-  }, []); // Only run once on mount
-
-  // Track tab close events
+  }, []);  // Track tab close events
   useEffect(() => {
     const handleBeforeUnload = async () => {
       if (sessionIdRef.current && user?.uid) { // Use UID from `user` state which should be populated

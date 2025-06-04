@@ -11,8 +11,8 @@ const InventoryRecords = () => {
 
   // Role checks using ROLES constants
   const isAdmin = user?.role === ROLES.ADMIN;
-  const isManager = user?.role === ROLES.MANAGER;
-  const isTeamLeader = user?.role === ROLES.TEAMLEADER;
+  // const isManager = user?.role === ROLES.MANAGER;
+  // const isTeamLeader = user?.role === ROLES.TEAMLEADER;
   const isTeamMember = user?.role === ROLES.TEAMMEMBER;
 
   const [inventory, setInventory] = useState([]);
