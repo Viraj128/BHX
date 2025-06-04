@@ -134,7 +134,7 @@ const ChangePhoneNumber = () => {
 
   // Handle navigation back
   const handleBack = () => {
-    navigate('/admin/users');
+    navigate('/users');
   };
 
   // Render complex fields (bank_details, changeField, timestamps)
