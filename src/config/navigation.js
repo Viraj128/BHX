@@ -21,7 +21,7 @@ export const NAV_ITEMS = [
     path: PATHS.ATTENDANCE,
     roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
   },
-    {
+  {
     // Attendance page available to all roles
     label: 'Attendance',
     path: PATHS.MEMBERATTENDANCE,
@@ -53,7 +53,7 @@ export const NAV_ITEMS = [
         label: 'Stock Movement',
         path: PATHS.STOCK_MOVEMENT,
         roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
-      },{
+      }, {
         // Sub-navigation for Stock Movement
         label: 'Inventory Records',
         path: PATHS.INVENTORY_RECORDS,
@@ -63,7 +63,7 @@ export const NAV_ITEMS = [
     // Only show the Inventory section for these roles
     roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
   },
-   {
+  {
     label: 'Cash Management',
     subItems: [
       {
@@ -99,27 +99,62 @@ export const NAV_ITEMS = [
     ],
     roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
   },
-   {
+  {
     // ItemsManagement is a collapsible section with sub-items, only for Admin
     label: 'itemsmanagement',
     subItems: [
-      { 
+      {
         label: 'Categories',
         path: PATHS.CATEGORIES,
-        roles: [ROLES.ADMIN , ROLES.MANAGER, ROLES.TEAMLEADER]
+        roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
       },
-      {  
+      {
         label: 'Items',
         path: PATHS.ITEMS,
-        roles: [ROLES.ADMIN , ROLES.MANAGER, ROLES.TEAMLEADER]
+        roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
       },
       {
         label: 'Sauces',
         path: PATHS.SAUCES,
-        roles: [ROLES.ADMIN , ROLES.MANAGER, ROLES.TEAMLEADER]
+        roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
       }
     ],
     // Only show the ItemsManagement section for these roles
-    roles: [ROLES.ADMIN , ROLES.MANAGER, ROLES.TEAMLEADER]
+    roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
+  }, {
+    //Reports Section 
+    label: 'reports',
+    subItems: [
+      {
+        label: 'Tracking Waste Report',
+        path: PATHS.TRACK_INVETORY_WASTE,
+        roles: [ROLES.ADMIN, ROLES.MANAGER]
+      }, {
+        label: 'Total Sales Report',
+        path: PATHS.TOTAL_SALE_PER_ITEM,
+        roles: [ROLES.ADMIN, ROLES.MANAGER]
+      },
+      {
+        label: 'Monthly Sales Report',
+        path: PATHS.MONTHLY_SALE,
+        roles: [ROLES.ADMIN, ROLES.MANAGER]
+      },
+      {
+        label: 'Weekly Sales Report',
+        path: PATHS.WEEKLY_SALE,
+        roles: [ROLES.ADMIN, ROLES.MANAGER]
+      },
+      {
+        label: 'Hourly Sales Report',
+        path: PATHS.HOURSLY_SALE,
+        roles: [ROLES.ADMIN, ROLES.MANAGER]
+      },
+      {
+        label: 'Customer Trend Report',
+        path: PATHS.CUSTOMER_TREND,
+        roles: [ROLES.ADMIN, ROLES.MANAGER]
+      }
+    ],
+    roles: [ROLES.ADMIN, ROLES.MANAGER]
   }
 ];

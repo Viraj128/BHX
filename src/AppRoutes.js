@@ -36,6 +36,16 @@ import SafeCountPage from './pages/cashManagement/SafeCountPage';
 import TransferFloats from './pages/cashManagement/TransferFloats';
 
 
+//Reports 
+import TrackInventoryWaste from './pages/reports/trakInvetroyWaste';
+import MonthlySalesDashboard from './pages/reports/monthlySale';
+import HourlySalesDashboard from './pages/reports/hourslysale';
+import WeeklySalesDashboard  from './pages/reports/weeklySale';
+import SalesPerItemsReport from './pages/reports/totalsaleperitem';
+import CustomerOrderTrendReport  from './pages/reports/customerTrend';
+
+
+
 function AppRoutes() {
   return (
     <Routes>
@@ -115,6 +125,21 @@ function AppRoutes() {
           <Route path="/itemsmanagement/categories" element={<Categories />} />
           <Route path="/itemsmanagement/items" element={<ItemsManager />} />
           <Route path="/itemsmanagement/sauces" element={<Sauces />} />
+        </Route>
+      </Route>
+
+      {/* Reports for Admin , Manager  */}
+      <Route element={<ProtectedRoute allowedRoles={[
+        ROLES.ADMIN,
+        ROLES.MANAGER
+      ]} />}>
+        <Route element={<Layout />}>
+          <Route path="/reports/trackingWaste" element={<TrackInventoryWaste />} />
+          <Route path="/reports/totalsaleperitem" element={<SalesPerItemsReport />} />
+          <Route path="/reports/monthlySale" element={<MonthlySalesDashboard />} />
+          <Route path="/reports/weeklySale" element={<WeeklySalesDashboard />} />
+          <Route path="/reports/hourlySale" element={<HourlySalesDashboard />} />
+          <Route path="/reports/customerTrend" element={<CustomerOrderTrendReport />} />
         </Route>
       </Route>
 

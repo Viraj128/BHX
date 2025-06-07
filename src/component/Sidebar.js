@@ -129,16 +129,16 @@ const Sidebar = () => {
                   >
                     Stock Movement
                   </button>
-                    <button
-                      className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                      onClick={() => navigate('/inventory/inventoryrecords')}
-                    >
-                      Inventory Records
-                    </button>
+                  <button
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/inventory/inventoryrecords')}
+                  >
+                    Inventory Records
+                  </button>
                 </div>
               )}
             </div>
-   <div className="space-y-1">
+            <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
                 onClick={() => toggleSection('cashManagement')}
@@ -185,8 +185,6 @@ const Sidebar = () => {
               )}
             </div>
 
-
-
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -214,7 +212,7 @@ const Sidebar = () => {
                   >
                     Items
                   </button>
-                   <button
+                  <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                     onClick={() => navigate('/itemsmanagement/sauces')}
                   >
@@ -258,8 +256,64 @@ const Sidebar = () => {
             )}
           </div>
         )}
-      </nav>
 
+        {(isAdmin  || isManager) && (
+          <div className="space-y-1">
+            <button
+              className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+              onClick={() => toggleSection('reports')}
+            >
+              <span>Reports</span>
+              {openSection === 'reports' ? (
+                <ChevronDownIcon className="h-4 w-4" />
+              ) : (
+                <ChevronRightIcon className="h-4 w-4" />
+              )}
+            </button>
+
+            {openSection === 'reports' && (
+              <div className="ml-4 space-y-1">
+                <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate('/reports/trackingWaste')}
+                >
+                  Trak Inventory Waste
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate('/reports/totalsaleperitem')}
+                >
+                  Total Sale Per Item
+                </button>
+                 <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate('/reports/monthlySale')}
+                >
+                  Monthly Sale
+                </button>
+                 <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate('/reports/weeklySale')}
+                >
+                  Weekly Sale 
+                </button>
+                 <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate('/reports/hourlySale')}
+                >
+                  Hourly Sale 
+                </button>
+                 <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate('/reports/customerTrend')}
+                >
+                  Customer Trend
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </nav>
       <div className="mt-auto pt-4 border-t border-gray-200">
         <button
           onClick={handleLogout}
