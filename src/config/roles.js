@@ -13,27 +13,37 @@ export const PATHS = {
   DASHBOARD: '/dashboard',
   USERS: '/users',
   ATTENDANCE: '/attendance',
+
+  //Inventroy
   STOCK_COUNT: '/inventory/stock-count',
   WASTE_MANAGEMENT: '/inventory/waste-management',
   INVENTORY_RECORDS: '/inventory/inventoryrecords',
   STOCK_MOVEMENT: '/inventory/stock-movement',
+
+  //Team Member
   VIEWDETAILS: '/viewDetails',
+
+  //Item Management 
   CATEGORIES : '/itemsmanagement/categories',
   ITEMS : '/itemsmanagement/items',
   SAUCES : '/itemsmanagement/sauces',
+
+  //Cash Management 
   CASH_MANAGEMENT_OPEN_CASHIER: '/cash-management/open-cashier',
   CASH_MANAGEMENT_CLOSE_CASHIER: '/cash-management/close-cashier',
   CASH_MANAGEMENT_BANKING: '/cash-management/banking',
   CASH_MANAGEMENT_SAFE_COUNT: '/cash-management/safe-count',
   CASH_MANAGEMENT_TRANSFER_FLOATS: '/cash-management/transfer-floats',
+
   //Reports  
   TRACK_INVETORY_WASTE : '/reports/trackingWaste',
   TOTAL_SALE_PER_ITEM : '/reports/totalsaleperitem',
   WEEKLY_SALE : '/reports/weeklySale',
   HOURSLY_SALE : '/reports/hourlySale',
   CUSTOMER_TREND : '/reports/customerTrend',
-  MONTHLY_SALE : '/reports/monthlySale'
-
+  MONTHLY_SALE : '/reports/monthlySale',
+  CUSTOMER_REPORT : '/reports/customerreports',
+  KOT : '/reports/kot',
 };
 
 // Utility function to return the dashboard path.

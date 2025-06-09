@@ -224,40 +224,7 @@ const Sidebar = () => {
           </>
         )}
 
-        {isAdmin && (
-          <div className="space-y-1">
-            <button
-              className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-              onClick={() => toggleSection('customerTracking')}
-            >
-              <span>Customer Tracking</span>
-              {openSection === 'customerTracking' ? (
-                <ChevronDownIcon className="h-4 w-4" />
-              ) : (
-                <ChevronRightIcon className="h-4 w-4" />
-              )}
-            </button>
-
-            {openSection === 'customerTracking' && (
-              <div className="ml-4 space-y-1">
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/customer-tracking/reports')}
-                >
-                  Customer Report
-                </button>
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/customer-tracking/kot')}
-                >
-                  KOT Reports
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {(isAdmin  || isManager) && (
+        {(isAdmin || isManager) && (
           <div className="space-y-1">
             <button
               className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -285,30 +252,44 @@ const Sidebar = () => {
                 >
                   Total Sale Per Item
                 </button>
-                 <button
+                <button
                   className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                   onClick={() => navigate('/reports/monthlySale')}
                 >
                   Monthly Sale
                 </button>
-                 <button
+                <button
                   className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                   onClick={() => navigate('/reports/weeklySale')}
                 >
-                  Weekly Sale 
+                  Weekly Sale
                 </button>
-                 <button
+                <button
                   className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                   onClick={() => navigate('/reports/hourlySale')}
                 >
-                  Hourly Sale 
+                  Hourly Sale
                 </button>
-                 <button
+                <button
                   className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                   onClick={() => navigate('/reports/customerTrend')}
                 >
                   Customer Trend
                 </button>
+                {isAdmin && (
+                  <> <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate('/reports/kot')}
+                >
+                  KOT Reports
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate('/reports/customerreports')}
+                >
+                  Customer Report
+                </button>
+                </>)}
               </div>
             )}
           </div>

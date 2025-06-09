@@ -40,9 +40,11 @@ import TransferFloats from './pages/cashManagement/TransferFloats';
 import TrackInventoryWaste from './pages/reports/trakInvetroyWaste';
 import MonthlySalesDashboard from './pages/reports/monthlySale';
 import HourlySalesDashboard from './pages/reports/hourslysale';
-import WeeklySalesDashboard  from './pages/reports/weeklySale';
+import WeeklySalesDashboard from './pages/reports/weeklySale';
 import SalesPerItemsReport from './pages/reports/totalsaleperitem';
-import CustomerOrderTrendReport  from './pages/reports/customerTrend';
+import CustomerOrderTrendReport from './pages/reports/customerTrend';
+import CustomerReport from './pages/reports/CustomerReport';
+import KOT from './pages/reports/KOT';
 
 
 
@@ -140,6 +142,8 @@ function AppRoutes() {
           <Route path="/reports/weeklySale" element={<WeeklySalesDashboard />} />
           <Route path="/reports/hourlySale" element={<HourlySalesDashboard />} />
           <Route path="/reports/customerTrend" element={<CustomerOrderTrendReport />} />
+          <Route path="/reports/kot" element={<KOT />} />
+          <Route path="/reports/customerreports" element={<CustomerReport />} />
         </Route>
       </Route>
 
