@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "target": "main-database2",
+    "target": "bhookie-maindatabase2",
     "public": "build",
     "ignore": [
       "firebase.json",

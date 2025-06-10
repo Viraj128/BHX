@@ -129,16 +129,16 @@ const Sidebar = () => {
                   >
                     Stock Movement
                   </button>
-                  <button
-                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/inventory/inventoryrecords')}
-                  >
-                    Inventory Records
-                  </button>
+                    <button
+                      className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                      onClick={() => navigate('/inventory/inventoryrecords')}
+                    >
+                      Inventory Records
+                    </button>
                 </div>
               )}
             </div>
-            <div className="space-y-1">
+   <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
                 onClick={() => toggleSection('cashManagement')}
@@ -185,6 +185,8 @@ const Sidebar = () => {
               )}
             </div>
 
+
+
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -212,7 +214,7 @@ const Sidebar = () => {
                   >
                     Items
                   </button>
-                  <button
+                   <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                     onClick={() => navigate('/itemsmanagement/sauces')}
                   >
@@ -224,7 +226,7 @@ const Sidebar = () => {
           </>
         )}
 
-        {(isAdmin || isManager) && (
+         {(isAdmin || isManager) && (
           <div className="space-y-1">
             <button
               className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -295,6 +297,7 @@ const Sidebar = () => {
           </div>
         )}
       </nav>
+
       <div className="mt-auto pt-4 border-t border-gray-200">
         <button
           onClick={handleLogout}

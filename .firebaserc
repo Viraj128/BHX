@@ -7,6 +7,9 @@
       "hosting": {
         "main-database2": [
           "main-database2"
+        ],
+        "bhookie-maindatabase2": [
+          "bhookie-maindatabase2"
         ]
       }
     }

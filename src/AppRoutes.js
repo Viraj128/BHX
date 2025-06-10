@@ -35,7 +35,6 @@ import BankingPage from './pages/cashManagement/BankingPage';
 import SafeCountPage from './pages/cashManagement/SafeCountPage';
 import TransferFloats from './pages/cashManagement/TransferFloats';
 
-
 //Reports 
 import TrackInventoryWaste from './pages/reports/trakInvetroyWaste';
 import MonthlySalesDashboard from './pages/reports/monthlySale';
@@ -45,7 +44,6 @@ import SalesPerItemsReport from './pages/reports/totalsaleperitem';
 import CustomerOrderTrendReport from './pages/reports/customerTrend';
 import CustomerReport from './pages/reports/CustomerReport';
 import KOT from './pages/reports/KOT';
-
 
 
 function AppRoutes() {
@@ -130,7 +128,7 @@ function AppRoutes() {
         </Route>
       </Route>
 
-      {/* Reports for Admin , Manager  */}
+ {/* Reports for Admin , Manager  */}
       <Route element={<ProtectedRoute allowedRoles={[
         ROLES.ADMIN,
         ROLES.MANAGER
@@ -147,6 +145,7 @@ function AppRoutes() {
         </Route>
       </Route>
 
+      
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
