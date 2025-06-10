@@ -23,9 +23,9 @@ export const NAV_ITEMS = [
   },
   {
     // Attendance page available to all roles
-    label: 'Attendance',
-    path: PATHS.MEMBERATTENDANCE,
-    roles: [ROLES.TEAMMEMBER]
+    label: 'Member Attendance',
+    path: PATHS.MEMBER_ATTENDANCE,
+    roles: [ROLES.TEAMMEMBER , ROLES.TEAMLEADER , ROLES.MANAGER]
   },
   {
     label: 'View Details',

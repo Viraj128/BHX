@@ -85,12 +85,20 @@ const Sidebar = () => {
           </button>
         )}
 
-        {(isAdmin || isManager || isTeamLeader || isTeamMember) && (
+        {(isAdmin || isManager || isTeamLeader) && (
           <button
             className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
             onClick={() => navigate('/attendance')}
           >
             Attendance
+          </button>
+        )}
+        {(isTeamMember) && (
+          <button
+            className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+            onClick={() => navigate('/memberAttendance')}
+          >
+           Member Attendance
           </button>
         )}
 
@@ -129,16 +137,16 @@ const Sidebar = () => {
                   >
                     Stock Movement
                   </button>
-                    <button
-                      className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                      onClick={() => navigate('/inventory/inventoryrecords')}
-                    >
-                      Inventory Records
-                    </button>
+                  <button
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/inventory/inventoryrecords')}
+                  >
+                    Inventory Records
+                  </button>
                 </div>
               )}
             </div>
-   <div className="space-y-1">
+            <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
                 onClick={() => toggleSection('cashManagement')}
@@ -214,7 +222,7 @@ const Sidebar = () => {
                   >
                     Items
                   </button>
-                   <button
+                  <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                     onClick={() => navigate('/itemsmanagement/sauces')}
                   >
@@ -226,7 +234,7 @@ const Sidebar = () => {
           </>
         )}
 
-         {(isAdmin || isManager) && (
+        {(isAdmin || isManager) && (
           <div className="space-y-1">
             <button
               className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -280,18 +288,18 @@ const Sidebar = () => {
                 </button>
                 {isAdmin && (
                   <> <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/reports/kot')}
-                >
-                  KOT Reports
-                </button>
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/reports/customerreports')}
-                >
-                  Customer Report
-                </button>
-                </>)}
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/reports/kot')}
+                  >
+                    KOT Reports
+                  </button>
+                    <button
+                      className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                      onClick={() => navigate('/reports/customerreports')}
+                    >
+                      Customer Report
+                    </button>
+                  </>)}
               </div>
             )}
           </div>

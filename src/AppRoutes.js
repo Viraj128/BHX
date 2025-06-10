@@ -8,6 +8,7 @@ import Layout from '../src/layout/layout';
 import Users from '../src/pages/Users';
 import Attendance from '../src/pages/Attendance';
 import UserDetails from '../src/pages/UserDetails';
+import MemberAttendance from './pages/MemberAttendance';
 
 // Inventroy 
 import StockCount from './pages/inventory/StockCount';
@@ -61,7 +62,26 @@ function AppRoutes() {
       ]} />}>
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={[
+        ROLES.ADMIN,
+        ROLES.MANAGER,
+        ROLES.TEAMLEADER,
+      ]} />}>
+        <Route element={<Layout />}>
           <Route path="/attendance" element={<Attendance />} />
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={[
+        ROLES.TEAMMEMBER,
+        ROLES.MANAGER,
+        ROLES.TEAMLEADER,
+      ]} />}>
+        <Route element={<Layout />}>
+          <Route path="/memberAttendance" element={<MemberAttendance />} />
         </Route>
       </Route>
 
@@ -128,7 +148,7 @@ function AppRoutes() {
         </Route>
       </Route>
 
- {/* Reports for Admin , Manager  */}
+      {/* Reports for Admin , Manager  */}
       <Route element={<ProtectedRoute allowedRoles={[
         ROLES.ADMIN,
         ROLES.MANAGER
@@ -145,7 +165,8 @@ function AppRoutes() {
         </Route>
       </Route>
 
-      
+
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

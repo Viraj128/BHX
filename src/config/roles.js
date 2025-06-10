@@ -13,6 +13,7 @@ export const PATHS = {
   DASHBOARD: '/dashboard',
   USERS: '/users',
   ATTENDANCE: '/attendance',
+  MEMBER_ATTENDANCE: '/memberAttendance',
 
   //Inventroy
   STOCK_COUNT: '/inventory/stock-count',
@@ -24,9 +25,9 @@ export const PATHS = {
   VIEWDETAILS: '/viewDetails',
 
   //Item Management 
-  CATEGORIES : '/itemsmanagement/categories',
-  ITEMS : '/itemsmanagement/items',
-  SAUCES : '/itemsmanagement/sauces',
+  CATEGORIES: '/itemsmanagement/categories',
+  ITEMS: '/itemsmanagement/items',
+  SAUCES: '/itemsmanagement/sauces',
 
   //Cash Management 
   CASH_MANAGEMENT_OPEN_CASHIER: '/cash-management/open-cashier',
@@ -36,14 +37,14 @@ export const PATHS = {
   CASH_MANAGEMENT_TRANSFER_FLOATS: '/cash-management/transfer-floats',
 
   //Reports  
-  TRACK_INVETORY_WASTE : '/reports/trackingWaste',
-  TOTAL_SALE_PER_ITEM : '/reports/totalsaleperitem',
-  WEEKLY_SALE : '/reports/weeklySale',
-  HOURSLY_SALE : '/reports/hourlySale',
-  CUSTOMER_TREND : '/reports/customerTrend',
-  MONTHLY_SALE : '/reports/monthlySale',
-  CUSTOMER_REPORT : '/reports/customerreports',
-  KOT : '/reports/kot',
+  TRACK_INVETORY_WASTE: '/reports/trackingWaste',
+  TOTAL_SALE_PER_ITEM: '/reports/totalsaleperitem',
+  WEEKLY_SALE: '/reports/weeklySale',
+  HOURSLY_SALE: '/reports/hourlySale',
+  CUSTOMER_TREND: '/reports/customerTrend',
+  MONTHLY_SALE: '/reports/monthlySale',
+  CUSTOMER_REPORT: '/reports/customerreports',
+  KOT: '/reports/kot',
 };
 
 // Utility function to return the dashboard path.
