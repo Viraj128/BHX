@@ -35,6 +35,7 @@ import CloseCashier from './pages/cashManagement/CloseCashier';
 import BankingPage from './pages/cashManagement/BankingPage';
 import SafeCountPage from './pages/cashManagement/SafeCountPage';
 import TransferFloats from './pages/cashManagement/TransferFloats';
+import MoneyMovementPage from './pages/cashManagement/MoneyMovement';
 
 //Reports 
 import TrackInventoryWaste from './pages/reports/trakInvetroyWaste';
@@ -130,6 +131,7 @@ function AppRoutes() {
           <Route path="/cash-management/banking" element={<BankingPage />} />
           <Route path="/cash-management/safe-count" element={<SafeCountPage />} />
           <Route path="/cash-management/transfer-floats" element={<TransferFloats />} />
+           <Route path="/cash-management/money-movement" element={<MoneyMovementPage />} />
         </Route>
       </Route>
 

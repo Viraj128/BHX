@@ -35,7 +35,8 @@ export const PATHS = {
   CASH_MANAGEMENT_BANKING: '/cash-management/banking',
   CASH_MANAGEMENT_SAFE_COUNT: '/cash-management/safe-count',
   CASH_MANAGEMENT_TRANSFER_FLOATS: '/cash-management/transfer-floats',
-
+  CASH_MANAGEMENT_MONEY_MOVEMENT:'/cash-management/money-movement',
+  
   //Reports  
   TRACK_INVETORY_WASTE: '/reports/trackingWaste',
   TOTAL_SALE_PER_ITEM: '/reports/totalsaleperitem',

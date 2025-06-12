@@ -95,6 +95,11 @@ export const NAV_ITEMS = [
         label: 'Transfer Floats',
         path: PATHS.CASH_MANAGEMENT_TRANSFER_FLOATS,
         roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
+      },
+      {
+        label: 'Money Movement',
+        path: PATHS.CASH_MANAGEMENT_MONEY_MOVEMENT,
+        roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]
       }
     ],
     roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]

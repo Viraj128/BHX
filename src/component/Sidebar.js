@@ -188,6 +188,12 @@ const Sidebar = () => {
                   >
                     Safe Count
                   </button>
+                   <button
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/cash-management/money-movement')}
+                  >
+                    Money Movement
+                  </button>
 
                 </div>
               )}

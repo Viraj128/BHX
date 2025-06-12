@@ -10,6 +10,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import dayjs from "dayjs";
 
 const denominations = [
   { label: "1p", value: 0.01 },
@@ -94,27 +95,39 @@ export default function OpenCashier() {
     const floatRef = doc(db, "floats", floatDocId);
     const existingFloat = await getDoc(floatRef);
 
+    
+    let retainedAmount =0;
+
+    try{
+      const closuresRef = collection(db, "floatClosures");
+    const q = query(
+      closuresRef,
+      where("type", "==", floatType)
+    );
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      // Find the most recent floatClosure by date
+      const closures = snapshot.docs.map(doc => doc.data());
+      const latestClosure = closures.sort((a, b) => {
+        const dateA = new Date(a.closedAt?.toDate?.() || a.closedAt);
+        const dateB = new Date(b.closedAt?.toDate?.() || b.closedAt);
+        return dateB - dateA;
+      })[0];
+      retainedAmount = latestClosure?.retainedAmount || 0;
+    }
+    }catch(err){
+console.error("Error fetching retainedAmount from floatClosures:", err);
+    }
     if (existingFloat.exists()) {
       const floatData = existingFloat.data();
-      const cashierSessionsRef = collection(
-        db,
-        "floats",
-        floatDocId,
-        "cashierSessions"
-      );
-      const sessionSnap = await getDocs(cashierSessionsRef);
-      const activeSession = sessionSnap.docs.find((doc) => !doc.data().closedAt);
-
-      if (activeSession) {
-        alert(
-          `Float ${floatType} is currently assigned.`
-        );
-        return;
+      
+      if(!floatData.closedAt){
+        alert(`Float ${floatType} is currently assigned and still open.`);
+         return;
       }
-
-      const retained = floatData.RetainedAmount || 0;
-      setExpectedFloat(retained);
-      setRetainedAmount(retained);
+      
+      setExpectedFloat(retainedAmount);
+      setRetainedAmount(retainedAmount);
     } else {
       setExpectedFloat(0);
       setRetainedAmount(0);
@@ -161,17 +174,12 @@ export default function OpenCashier() {
       alert("Invalid witness ID or not a manager/team leader.");
       return;
     }
-    // Continue with float creation...
-  
-
+    
     const today = new Date();
     const formattedDate = today.toISOString().split("T")[0];
     const docId = `float${floatType}_${formattedDate}`;
     const floatRef = doc(db, "floats", docId);
     const existingFloat = await getDoc(floatRef);
-
-    
-
     const data = {
       type: floatType,
       date: formattedDate,
@@ -198,22 +206,26 @@ export default function OpenCashier() {
 
     try {
       await setDoc(floatRef, data);
+      const cashierName = cashiers.find(c => c.id === selectedCashier)?.name || selectedCashier;
 
-      const cashierSessionsRef = collection(
-        db,
-        "floats",
-        docId,
-        "cashierSessions"
-      );
-      const newSessionRef = doc(
-        cashierSessionsRef,
-        `${selectedCashier}_${Date.now()}`
-      );
-      await setDoc(newSessionRef, {
-        EmployeeId: selectedCashier,
-        openedAt: serverTimestamp(),
-        closedAt: null,
-      });
+     const now = dayjs();
+     const timestampId = now.format("YYYY-MM-DD_HH-mm-ss");
+     const moneyMovementRef = doc(db, "moneyMovement",timestampId ); // 'moneyMovement/2025-05-30'
+
+     await setDoc(moneyMovementRef, {
+      timestamp: serverTimestamp(),
+      type: "float_open",
+      amount: Number((totalValue + retainedAmount).toFixed(2)),
+      direction: "in",
+      userId: selectedCashier,
+      session: "—",
+      note: `Float opened (${floatType}) for cashier ${cashierName}`,
+      authorisedBy: { 
+        cashierEmployeeId: authCashierId,
+        witnessEmployeeId: authWitnessId,
+  },
+});
+
 
       alert(`Float ${floatType} assigned to cashier successfully.`);
 

@@ -9,6 +9,7 @@ import {
   updateDoc,
   query, where,
 } from "firebase/firestore";
+import dayjs from "dayjs";
 
 // Denominations list for counting
 const denominations = [
@@ -30,7 +31,7 @@ export default function CloseCashier() {
   const [counts, setCounts] = useState({});
   const [cashiers, setCashiers] = useState([]);
   const [selectedCashier, setSelectedCashier] = useState("");
-  const [expectedFloat, setExpectedFloat] = useState(null);
+  const [expectedAmount, setExpectedAmount] = useState(null);
   const [attemptCount, setAttemptCount] = useState(0);
   const [reason, setReason] = useState("");
   const [auth, setAuth] = useState({ name: "", password: "" });
@@ -68,7 +69,7 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
   useEffect(() => {
     const fetchAssignedFloat = async () => {
       if (!selectedCashier) {
-        setExpectedFloat(null);
+        setExpectedAmount(null);
         return;
       }
   
@@ -83,10 +84,10 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
       
       if (!floatSnap.empty) {
         const floatData = floatSnap.docs[0].data();
-        setExpectedFloat(Number(floatData.initialCount));
+        setExpectedAmount(Number(floatData.initialCount));
         setIsClosed(floatData.closed);
       } else {
-        setExpectedFloat(null);
+        setExpectedAmount(null);
         setIsClosed(false);
       }
     };
@@ -112,11 +113,11 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
   }, 0);
 
   // Variance between expected and counted total
-  const variance = expectedFloat !== null ? totalValue - expectedFloat : 0;
+  const variance = expectedAmount !== null ? totalValue - expectedAmount : 0;
 
   // Handle submit when "Continue" is clicked
   const handleSubmit = () => {
-    if (!selectedCashier || expectedFloat === null) {
+    if (!selectedCashier || expectedAmount === null) {
       alert("Please select a cashier with an assigned float");
       return;
     }
@@ -173,10 +174,18 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
     const witness = witnessSnap.docs[0].data();
     
 
-      // 1. Find matching float
+      //fetch float and extract floatType from doc Id
       const floatSnap = await getDocs(collection(db, "floats"));
       const matchingFloat = floatSnap.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .map((doc) =>{
+         const floatTypeMatch = doc.id.match(/^float([A-Z])_/i); // e.g., extract "A" from "floatA_2025-06-10"
+        return {
+          id: doc.id,
+          floatType: floatTypeMatch ? floatTypeMatch[1] : null,
+          ...doc.data()
+        } ;
+      })
+          
         .find(
           (doc) =>
             doc.EmployeeId === selectedCashier && // Match selected cashier
@@ -192,53 +201,8 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
         alert("This float has already been closed.");
         return;
       }
-
-      // 2. Update float document
-      await updateDoc(doc(db, "floats", matchingFloat.id), {
-        closed: true,
-        isOpen: false,
-        closedAt: serverTimestamp() //  Add this line
-      });
-
-      // 3. Update cashier session in subcollection
-      const sessionsRef = collection(db, "floats", matchingFloat.id, "cashierSessions");
-      const activeSessionQuery = query(sessionsRef, where("closedAt", "==", null));
-      const activeSessionSnap = await getDocs(activeSessionQuery);
-
-      if (!activeSessionSnap.empty) {
-        const sessionDoc = activeSessionSnap.docs[0];
-        await updateDoc(doc(sessionsRef, sessionDoc.id), {
-          closedAt: serverTimestamp()
-        });
-      }
-
-
-
-      const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0];
-      const docId = `${selectedCashier}_${formattedDate}`;
-      const data = {
-        cashierId: selectedCashier,
-        type: "cashier_close",
-        date: formattedDate,
-        timestamp: serverTimestamp(),
-        expected: Number(expectedFloat),
-        total: Number(totalValue.toFixed(2)),
-        variance: Number(variance.toFixed(2)),
-        entries: denominations.map((d) => ({
-          denomination: d.label,
-          count: counts[d.label] || 0,
-          value: Number(((counts[d.label] || 0) * d.value).toFixed(2)),
-        })),
-        reason: reason || null,
-        authorizedBy: { 
-          cashierEmployeeId: auth.password ,
-          witnessManagerId:auth.witnessId,
-      },
-      };
-
-      // Save to floatClosures
-      await setDoc(doc(db, "floatClosures", docId), data);
+      
+      const floatType = matchingFloat.floatType;
 
       // Now, store the denominations from £5 to £50 in the safeDrop collection
       const safeFloatsData = denominations
@@ -250,6 +214,9 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
           type: "safe_float", // Mark as a safe drop entry
         }));
 
+      const today = new Date();
+      const formattedDate = today.toISOString().split("T")[0];
+
       const safeFloatsDocId = `${selectedCashier}_${formattedDate}`;
       const safeFloatsDocRef = doc(db, "SafeFloats", safeFloatsDocId);
 
@@ -257,6 +224,7 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
         denominations: safeFloatsData, // Store all denominations as an array in one document
         timestamp: serverTimestamp(),
         cashierId: selectedCashier,
+        isDropped:false,
       });
 
       //calculate total of SafeDrop denominations
@@ -264,38 +232,68 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
 
       //compute new float amoount (total counted -safeDrop Total)
       const leftOverAmount = Number((totalValue - safeFloatsTotal).toFixed(2));
+   
 
-      const sessionDocRef = doc(collection(db, "cashierSessions")); // or subcollection under floats
-      await setDoc(sessionDocRef, {
-        floatId: matchingFloat.id,
-        EmployeeId: selectedCashier,
-        expected: Number(expectedFloat),
+       //close the float
+      await updateDoc(doc(db, "floats", matchingFloat.id), {
+        closed: true,
+        isOpen: false,
+        closedAt: serverTimestamp(),
+        
+      });
+
+      //save float closure
+      const docId = `${selectedCashier}_${formattedDate}`;
+      const data = {
+        cashierId: selectedCashier,
+        type:floatType || null,
+        date: formattedDate,
+        timestamp: serverTimestamp(),
+        expectedAmount: Number(expectedAmount),
         total: Number(totalValue.toFixed(2)),
         variance: Number(variance.toFixed(2)),
-        retainedAmount: leftOverAmount,
-        denominations: denominations.map((d) => ({
+        retainedAmount:leftOverAmount,
+        entries: denominations.map((d) => ({
           denomination: d.label,
           count: counts[d.label] || 0,
           value: Number(((counts[d.label] || 0) * d.value).toFixed(2)),
         })),
         reason: reason || null,
-        authorizedBy: { id: auth.password },
-        openedAt: matchingFloat.openedAt, // optional
-      });
-      await updateDoc(sessionDocRef, {
-        closedAt: serverTimestamp(),
-      });
+        authorizedBy: { 
+          cashierEmployeeId: auth.password ,
+          witnessManagerId:auth.witnessId,
+      },
+      };
+     // Save to floatClosures
+      await setDoc(doc(db, "floatClosures", docId), data);
 
-      await updateDoc(doc(db, "floats", matchingFloat.id), {
-        closed: true,
-        isOpen: false,
-      });
+    const now = dayjs();
+    const timestampId = now.format("YYYY-MM-DD_HH-mm-ss");
+    const moneyMovementRef = doc(db, "moneyMovement",timestampId )
+
+    //store in moneyMovement collection
+await setDoc(moneyMovementRef, {
+  timestamp: serverTimestamp(),
+  type: "cashier_close",
+  amount: Number(totalValue.toFixed(2)),
+  expectedAmount: Number(expectedAmount),
+  variance: Number(variance.toFixed(2)),
+  direction: "out",
+  userId: selectedCashier,
+  session: "—" , // e.g., 'morning', 'evening'
+  note: reason || null,
+  authorisedBy: {
+    cashierEmployeeId: auth.password ,
+    witnessEmployeeId: auth.witnessId,
+  },
+});
+
 
 
       alert("Float closure and authorization successful.");
       setCounts({});
       setSelectedCashier("");
-      setExpectedFloat(null);
+      setExpectedAmount(null);
       setAttemptCount(0);
       setReason("");
       setAuth({ name: "", password: "" });
@@ -328,7 +326,7 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
     </select>
   </div>
 
-  {expectedFloat !== null && (
+  {expectedAmount !== null && (
     <>
       <h3 className="text-xl font-semibold text-gray-800 mb-4">Count Register</h3>
 
@@ -382,7 +380,7 @@ const [confirmWitnessChecked, setConfirmWitnessChecked] = useState(false);
         <div className="mt-8 border-t pt-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Variance Explanation</h3>
           <div className="text-base space-y-1 mb-4">
-            <div><strong>Expected Float:</strong> £{expectedFloat.toFixed(2)}</div>
+            <div><strong>Expected Float:</strong> £{expectedAmount.toFixed(2)}</div>
             <div><strong>Counted Total:</strong> £{totalValue.toFixed(2)}</div>
             <div className="text-red-700"><strong>Variance:</strong> £{variance.toFixed(2)}</div>
           </div>
