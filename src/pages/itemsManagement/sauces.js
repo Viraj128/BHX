@@ -3,7 +3,7 @@ import { db } from '../../firebase/config';
 import { collection, onSnapshot, setDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useAuth } from '../../auth/AuthContext';
 import { ROLES } from '../../config/roles';
-import { FiEdit, FiTrash2, FiPlus, FiSearch, FiX } from 'react-icons/fi';
+import { FiEdit, FiTrash2, FiPlus, FiSearch, FiX, FiToggleLeft, FiToggleRight } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
 const Sauces = () => {
@@ -55,6 +55,20 @@ const Sauces = () => {
     setFilteredGroups(results);
   }, [groups, searchTerm]);
 
+  const toggleActive = async (groupId, currentActive) => {
+    try {
+      const newActiveStatus = currentActive !== false; // If undefined or true, set to false; if false, set to true
+      const docRef = doc(db, 'sauceGroups', groupId);
+      await updateDoc(docRef, { active: !newActiveStatus });
+      setGroups(groups.map(group => 
+        group.id === groupId ? { ...group, active: !newActiveStatus } : group
+      ));
+    } catch (error) {
+      console.error("Error toggling sauce group status:", error);
+      alert("Failed to update sauce group status. Please try again.");
+    }
+  };
+
   // Check if user has access
   if (!isAdmin && !isManager && !isTeamLeader) {
     return (
@@ -90,9 +104,10 @@ const Sauces = () => {
 
       await setDoc(docRef, {
         sauces: saucesArray,
+        active: true // Add active status by default
       });
 
-      setGroups([...groups, { id: categoryName, sauces: saucesArray }]);
+      setGroups([...groups, { id: categoryName, sauces: saucesArray, active: true }]);
       setCategoryName('');
       setSaucesInput('');
     } catch (error) {
@@ -155,7 +170,7 @@ const Sauces = () => {
                 Manage your sauce groups and organization
               </p>
             </div>
-            <div className="mt-4 md:mt-0">
+            <div className="mt-4 md:mt-0 flex items-center space-x-4">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiSearch className="text-gray-400" />
@@ -175,6 +190,14 @@ const Sauces = () => {
                   </button>
                 )}
               </div>
+              {(isTeamLeader || isManager) && (
+                <button
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm ml-4"
+                  onClick={() => navigate("/attendance")}
+                >
+                  Back
+                </button>
+              )}
             </div>
           </div>
 
@@ -229,6 +252,9 @@ const Sauces = () => {
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Sauces
                     </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                      Status
+                    </th>
                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Actions
                     </th>
@@ -237,7 +263,7 @@ const Sauces = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {loading ? (
                     <tr>
-                      <td colSpan="3" className="px-6 py-8 text-center">
+                      <td colSpan="4" className="px-6 py-8 text-center">
                         <div className="flex justify-center">
                           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
                         </div>
@@ -246,7 +272,7 @@ const Sauces = () => {
                     </tr>
                   ) : filteredGroups.length === 0 ? (
                     <tr>
-                      <td colSpan="3" className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
                         {searchTerm ? "No matching sauce groups found" : "No sauce groups available"}
                       </td>
                     </tr>
@@ -280,6 +306,13 @@ const Sauces = () => {
                               ))}
                             </div>
                           )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            group.active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                          }`}>
+                            {group.active ? "Active" : "Inactive"}
+                          </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           {editingId === group.id ? (
@@ -321,12 +354,25 @@ const Sauces = () => {
                               <button
                                 onClick={() => handleDeleteGroup(group.id)}
                                 className={`p-2 rounded-lg transition-colors ${
-                                  isAdmin ? 'text-red-600 hover:bg-red-bad' : 'text-gray-400 cursor-not-allowed'
+                                  isAdmin ? 'text-red-600 hover:bg-red-50' : 'text-gray-400 cursor-not-allowed'
                                 }`}
                                 title="Delete"
                                 disabled={!isAdmin}
                               >
                                 <FiTrash2 size={18} />
+                              </button>
+                              <button
+                                onClick={() => toggleActive(group.id, group.active)}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  group.active ? "text-yellow-600 hover:bg-yellow-50" : "text-gray-600 hover:bg-gray-50"
+                                }`}
+                                title={group.active ? "Deactivate" : "Activate"}
+                              >
+                                {group.active ? (
+                                  <FiToggleRight size={20} />
+                                ) : (
+                                  <FiToggleLeft size={20} />
+                                )}
                               </button>
                             </div>
                           )}
@@ -341,7 +387,7 @@ const Sauces = () => {
 
           {!loading && filteredGroups.length > 0 && (
             <div className="mt-4 text-sm text-gray-500">
-              Showing {filteredGroups.length} of {groups.length} out sauce groups
+              Showing {filteredGroups.length} of {groups.length} sauce groups
             </div>
           )}
         </div>
