@@ -7,18 +7,16 @@ import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [openSection, setOpenSection] = useState(null); // Tracks the currently open section
+  const [openSection, setOpenSection] = useState(null);
 
   const isAdmin = user?.role === ROLES.ADMIN;
   const isManager = user?.role === ROLES.MANAGER;
   const isTeamLeader = user?.role === ROLES.TEAMLEADER;
   const isTeamMember = user?.role === ROLES.TEAMMEMBER;
 
-  // FIX: Improved timestamp handling
   const formatTime = (timestamp) => {
     if (!timestamp) return '';
 
-    // Handle both string and number formats
     const ts = typeof timestamp === 'string'
       ? parseInt(timestamp, 10)
       : timestamp;
@@ -35,22 +33,22 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     logout();
-    // Clear navigation history
     navigate('/login', { replace: true });
   };
 
-  // Toggle a section and close others
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
   };
 
   return (
     <div className="w-64 bg-white h-[100vh] p-4 flex flex-col border-r border-gray-200 fixed top-0 left-0">
+      {/* Header Section */}
       <div className="text-gray-800 mb-6">
         <h1 className="text-xl font-bold mb-1">BHX - Bhookie</h1>
         <div className="h-px bg-gray-200 w-full"></div>
       </div>
 
+      {/* User Info Section */}
       <div className="text-gray-800 mb-8">
         <h2 className="text-lg font-semibold">{user?.name || 'Unknown'}</h2>
         <p className="text-sm text-gray-600">{user?.role || 'Unknown'}</p>
@@ -59,51 +57,59 @@ const Sidebar = () => {
         </p>
       </div>
 
-      <nav className="flex-1 space-y-1">
-        <button
-          className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-          onClick={() => navigate('/dashboard')}
-        >
-          Dashboard
-        </button>
-
-        {(isAdmin || isManager || isTeamLeader) && (
+      {/* Scrollable Navigation */}
+      <nav className="flex-1 overflow-y-auto">
+        <div className="space-y-1">
+          {/* Dashboard */}
           <button
             className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-            onClick={() => navigate('/users')}
+            onClick={() => navigate('/dashboard')}
           >
-            User Management
+            Dashboard
           </button>
-        )}
 
-        {(isTeamMember) && (
-          <button
-            className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-            onClick={() => navigate('/viewDetails')}
-          >
-            View Details
-          </button>
-        )}
+          {/* User Management */}
+          {(isAdmin || isManager || isTeamLeader) && (
+            <button
+              className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+              onClick={() => navigate('/users')}
+            >
+              User Management
+            </button>
+          )}
 
-        {(isAdmin || isManager || isTeamLeader) && (
-          <button
-            className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-            onClick={() => navigate('/attendance')}
-          >
-            Attendance
-          </button>
-        )}
-        {(isTeamMember) && (
-          <button
-            className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-            onClick={() => navigate('/memberAttendance')}
-          >
-           Member Attendance
-          </button>
-        )}
+          {/* View Details */}
+          {(isTeamMember) && (
+            <button
+              className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+              onClick={() => navigate('/viewDetails')}
+            >
+              View Details
+            </button>
+          )}
 
-        {(isAdmin || isManager || isTeamLeader) && (
-          <>
+          {/* Attendance */}
+          {(isAdmin || isManager || isTeamLeader) && (
+            <button
+              className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+              onClick={() => navigate('/attendance')}
+            >
+              Attendance
+            </button>
+          )}
+          
+          {/* Member Attendance */}
+          {(isTeamMember) && (
+            <button
+              className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+              onClick={() => navigate('/memberAttendance')}
+            >
+              Member Attendance
+            </button>
+          )}
+
+          {/* Inventory Section */}
+          {(isAdmin || isManager || isTeamLeader) && (
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -146,6 +152,10 @@ const Sidebar = () => {
                 </div>
               )}
             </div>
+          )}
+
+          {/* Cash Management Section */}
+          {(isAdmin || isManager || isTeamLeader) && (
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -161,7 +171,6 @@ const Sidebar = () => {
 
               {openSection === 'cashManagement' && (
                 <div className="ml-4 space-y-1">
-
                   <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                     onClick={() => navigate('/cash-management/open-cashier')}
@@ -174,33 +183,31 @@ const Sidebar = () => {
                   >
                     Close Cashier
                   </button>
-                  {/* CHANGE: Added Banking link */}
                   <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                     onClick={() => navigate('/cash-management/banking')}
                   >
                     Banking
                   </button>
-                  {/* CHANGE: Added Safe Count link */}
                   <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                     onClick={() => navigate('/cash-management/safe-count')}
                   >
                     Safe Count
                   </button>
-                   <button
+                  <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                     onClick={() => navigate('/cash-management/money-movement')}
                   >
                     Money Movement
                   </button>
-
                 </div>
               )}
             </div>
+          )}
 
-
-
+          {/* Items Management Section */}
+          {(isAdmin || isManager || isTeamLeader) && (
             <div className="space-y-1">
               <button
                 className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
@@ -237,81 +244,85 @@ const Sidebar = () => {
                 </div>
               )}
             </div>
-          </>
-        )}
+          )}
 
-        {(isAdmin || isManager) && (
-          <div className="space-y-1">
-            <button
-              className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
-              onClick={() => toggleSection('reports')}
-            >
-              <span>Reports</span>
-              {openSection === 'reports' ? (
-                <ChevronDownIcon className="h-4 w-4" />
-              ) : (
-                <ChevronRightIcon className="h-4 w-4" />
-              )}
-            </button>
+          {/* Reports Section */}
+          {(isAdmin || isManager) && (
+            <div className="space-y-1">
+              <button
+                className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+                onClick={() => toggleSection('reports')}
+              >
+                <span>Reports</span>
+                {openSection === 'reports' ? (
+                  <ChevronDownIcon className="h-4 w-4" />
+                ) : (
+                  <ChevronRightIcon className="h-4 w-4" />
+                )}
+              </button>
 
-            {openSection === 'reports' && (
-              <div className="ml-4 space-y-1">
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/reports/trackingWaste')}
-                >
-                  Trak Inventory Waste
-                </button>
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/reports/totalsaleperitem')}
-                >
-                  Total Sale Per Item
-                </button>
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/reports/monthlySale')}
-                >
-                  Monthly Sale
-                </button>
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/reports/weeklySale')}
-                >
-                  Weekly Sale
-                </button>
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/reports/hourlySale')}
-                >
-                  Hourly Sale
-                </button>
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/reports/customerTrend')}
-                >
-                  Customer Trend
-                </button>
-                {isAdmin && (
-                  <> <button
+              {openSection === 'reports' && (
+                <div className="ml-4 space-y-1">
+                  <button
                     className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/reports/kot')}
+                    onClick={() => navigate('/reports/trackingWaste')}
                   >
-                    KOT Reports
+                    Trak Inventory Waste
                   </button>
-                    <button
-                      className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                      onClick={() => navigate('/reports/customerreports')}
-                    >
-                      Customer Report
-                    </button>
-                  </>)}
-              </div>
-            )}
-          </div>
-        )}
+                  <button
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/reports/totalsaleperitem')}
+                  >
+                    Total Sale Per Item
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/reports/monthlySale')}
+                  >
+                    Monthly Sale
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/reports/weeklySale')}
+                  >
+                    Weekly Sale
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/reports/hourlySale')}
+                  >
+                    Hourly Sale
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => navigate('/reports/customerTrend')}
+                  >
+                    Customer Trend
+                  </button>
+                  {isAdmin && (
+                    <>
+                      <button
+                        className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                        onClick={() => navigate('/reports/kot')}
+                      >
+                        KOT Reports
+                      </button>
+                      <button
+                        className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                        onClick={() => navigate('/reports/customerreports')}
+                      >
+                        Customer Report
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </nav>
 
+      {/* Logout Button */}
       <div className="mt-auto pt-4 border-t border-gray-200">
         <button
           onClick={handleLogout}
@@ -325,6 +336,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-
-
-
