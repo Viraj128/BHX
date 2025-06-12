@@ -1754,11 +1754,6 @@ const Attendance = () => {
     const newErrors = { userId: '', checkInStr: '', checkOutStr: '', shiftEndDate: '' };
     let isValid = true;
 
-    // Prevent Manager from adding their own attendance
-    if (isManager && newData.userId === user.uid) {
-      newErrors.userId = 'Managers cannot add their own attendance';
-      isValid = false;
-    }
 
     if (!newData.userId) {
       newErrors.userId = 'User selection is required';
@@ -1922,7 +1917,7 @@ const Attendance = () => {
   // Permission flags
   const showActionsColumn = (isAdmin && isEditableDate) || (isManager && isToday);
   const canAddNew = isAdmin && isEditableDate;
-  const canEdit = (isAdmin && isEditableDate) || (isManager && isToday) ;
+  const canEdit = (isAdmin && isEditableDate) || (isManager && isToday);
   const canDelete = isAdmin && isEditableDate;
 
   // Effects
@@ -1940,27 +1935,28 @@ const Attendance = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Team Attendance</h1>
 
-          <div className="flex items-center gap-4">
-            {(isTeamLeader || isTeamMember || isManager) && (
-              <Link
-                to="/memberAttendance"
-                className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition"
-                title="View Attendance"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </Link>)}
-            <h1 className="text-2xl font-bold text-gray-800">Team Attendance</h1>
-          </div>
           <div className="flex items-center gap-4 mt-4 sm:mt-0">
-            <input
-              type="date"
-              value={format(date, 'yyyy-MM-dd')}
-              onChange={(e) => setDate(new Date(e.target.value))}
-              className="p-2 border rounded-md text-sm bg-white shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={format(date, 'yyyy-MM-dd')}
+                onChange={(e) => setDate(new Date(e.target.value))}
+                className="p-2 border rounded-md text-sm bg-white shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+              {(isTeamLeader || isTeamMember || isManager) && (
+                <Link
+                  to="/memberAttendance"
+                  className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition"
+                  title="View Your Attendance"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </Link>
+              )}
+            </div>
             {canAddNew && (
               <button
                 onClick={() => setAddingNew(!addingNew)}

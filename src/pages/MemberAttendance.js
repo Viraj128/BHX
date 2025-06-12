@@ -4,6 +4,8 @@ import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { ROLES } from '../config/roles';
+import { useAuth } from "../auth/AuthContext";
 
 const MemberAttendance = () => {
   const navigate = useNavigate();
@@ -17,6 +19,12 @@ const MemberAttendance = () => {
   const [sortField, setSortField] = useState('date');
   const [sortDirection, setSortDirection] = useState('desc');
   const [userData, setUserData] = useState(null);
+  const { user } = useAuth();
+
+
+  // Role checks using ROLES constants
+  const isManager = user?.role === ROLES.MANAGER;
+  const isTeamLeader = user?.role === ROLES.TEAMLEADER;
 
   // Load user data from local storage
   useEffect(() => {
@@ -227,14 +235,18 @@ const MemberAttendance = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800 mb-4 sm:mb-0">My Attendance</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-semibold text-gray-800">My Attendance</h1>
+            {(isTeamLeader || isManager) && (
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm ml-4"
+                onClick={() => navigate("/attendance")}
+              >
+                Back
+              </button>
+            )}
+          </div>
         </div>
-        <button
-          className="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-green-700 transition-colors mb-6"
-          onClick={() => navigate("/attendance")}
-        >
-          Back to Users
-        </button>
 
         {/* Date Range Filter */}
         <div className="mb-6 p-4 bg-gray-50 rounded-md">
