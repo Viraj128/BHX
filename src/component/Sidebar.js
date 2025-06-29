@@ -97,7 +97,7 @@
 //               Attendance
 //             </button>
 //           )}
-          
+
 //           {/* Member Attendance */}
 //           {(isTeamMember) && (
 //             <button
@@ -320,6 +320,40 @@
 //             </div>
 //           )}
 //         </div>
+
+//  {isAdmin && (
+//           <div className="space-y-1">
+//             <button
+//               className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+//               onClick={() => toggleSection('haccaplog')}
+//             >
+//               <span>HACCAP Log</span>
+//               {openSection === 'haccaplog' ? (
+//                 <ChevronDownIcon className="h-4 w-4" />
+//               ) : (
+//                 <ChevronRightIcon className="h-4 w-4" />
+//               )}
+//             </button>
+
+//             {openSection === 'haccaplog' && (
+//               <div className="ml-4 space-y-1">
+//                 <button
+//                   className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+//                   onClick={() => navigate('/haccaplog/ShopCarthaccap')}
+//                 >
+//                   HACCAP Shop Cart Report
+//                 </button>
+//                 <button
+//                   className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+//                   onClick={() => navigate( '/haccaplog/foodCarthaccap')}
+//                 >
+//                   HACCAP Food Cart Report
+//                 </button>
+//               </div>
+//             )}
+//           </div>
+//         )}
+
 //       </nav>
 
 //       {/* Logout Button */}
@@ -722,6 +756,40 @@ const Sidebar = () => {
 
           </div>
         )}
+
+ {isAdmin && (
+          <div className="space-y-1">
+            <button
+              className="w-full flex justify-between items-center px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
+              onClick={() => toggleSection('haccaplog')}
+            >
+              <span>HACCAP Log</span>
+              {openSection === 'haccaplog' ? (
+                <ChevronDownIcon className="h-4 w-4" />
+              ) : (
+                <ChevronRightIcon className="h-4 w-4" />
+              )}
+            </button>
+
+            {openSection === 'haccaplog' && (
+              <div className="ml-4 space-y-1">
+                <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate('/haccaplog/ShopCarthaccap')}
+                >
+                  HACCAP Shop Cart Report
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                  onClick={() => navigate( '/haccaplog/foodCarthaccap')}
+                >
+                  HACCAP Food Cart Report
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        
       </nav>
 
       <div className="mt-auto pt-4 border-t border-gray-200">

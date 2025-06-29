@@ -46,7 +46,12 @@ export const PATHS = {
   MONTHLY_SALE: '/reports/monthlySale',
   CUSTOMER_REPORT: '/reports/customerreports',
   KOT: '/reports/kot',
+
+
+  HACCAPLOGSHOP : '/haccaplog/ShopCarthaccap',
+  HACCAPLOGFOODCART : '/haccaplog/foodCarthaccap'
 };
+
 
 // Utility function to return the dashboard path.
 // Useful for cases where you might later want to change or add logic to route generation.
