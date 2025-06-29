@@ -48,7 +48,7 @@
 // import KOT from './pages/reports/KOT';
 
 // import HACCPFormViewer from './pages/admin/HACCAPLogfoodCart';
-// import HACCPFormViewerShop  from './pages/admin/HACCAPLogfshop';
+// import HACCPFormViewerShop from './pages/admin/HACCAPLogfshop';
 // function AppRoutes() {
 //   return (
 //     <Routes>
@@ -132,7 +132,7 @@
 //           <Route path="/cash-management/banking" element={<BankingPage />} />
 //           <Route path="/cash-management/safe-count" element={<SafeCountPage />} />
 //           <Route path="/cash-management/transfer-floats" element={<TransferFloats />} />
-//            <Route path="/cash-management/money-movement" element={<MoneyMovementPage />} />
+//           <Route path="/cash-management/money-movement" element={<MoneyMovementPage />} />
 //         </Route>
 //       </Route>
 
@@ -168,15 +168,15 @@
 //         </Route>
 //       </Route>
 
-// {/* Reports for Admin */}
-// <Route element={<ProtectedRoute allowedRoles={[
-//   ROLES.ADMIN,
-// ]} />}>
-//   <Route element={<Layout />}>
-//     <Route path="/haccaplog/ShopCarthaccap" element={<HACCPFormViewerShop />} />
-//     <Route path="/haccaplog/foodCarthaccap" element={<HACCPFormViewer />} />
-//   </Route>
-// </Route>
+//       {/* Reports for Admin */}
+//       <Route element={<ProtectedRoute allowedRoles={[
+//         ROLES.ADMIN,
+//       ]} />}>
+//         <Route element={<Layout />}>
+//           <Route path="/haccaplog/ShopCarthaccap" element={<HACCPFormViewerShop />} />
+//           <Route path="/haccaplog/foodCarthaccap" element={<HACCPFormViewer />} />
+//         </Route>
+//       </Route>
 
 //       <Route path="*" element={<Navigate to="/" replace />} />
 //     </Routes>
