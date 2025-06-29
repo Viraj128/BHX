@@ -351,17 +351,20 @@ const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [openSection, setOpenSection] = useState(null); // Tracks the currently open section
+  const [openRestaurantSub, setOpenRestaurantSub] = useState(false);
+  const [openKartSub, setOpenKartSub] = useState(false);
+  const [openInventoryRestaurantSub, setOpenInventoryRestaurantSub] = useState(false);
+  const [openInventoryKartSub, setOpenInventoryKartSub] = useState(false);
+
 
   const isAdmin = user?.role === ROLES.ADMIN;
   const isManager = user?.role === ROLES.MANAGER;
   const isTeamLeader = user?.role === ROLES.TEAMLEADER;
   const isTeamMember = user?.role === ROLES.TEAMMEMBER;
 
-  // FIX: Improved timestamp handling
   const formatTime = (timestamp) => {
     if (!timestamp) return '';
 
-    // Handle both string and number formats
     const ts = typeof timestamp === 'string'
       ? parseInt(timestamp, 10)
       : timestamp;
@@ -378,11 +381,9 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     logout();
-    // Clear navigation history
     navigate('/login', { replace: true });
   };
 
-  // Toggle a section and close others
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
   };
@@ -402,7 +403,8 @@ const Sidebar = () => {
         </p>
       </div>
 
-      <nav className="flex-1 space-y-1">
+      <nav className="flex-1 overflow-y-auto space-y-1">
+
         <button
           className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md text-sm"
           onClick={() => navigate('/dashboard')}
@@ -460,36 +462,98 @@ const Sidebar = () => {
                 )}
               </button>
 
-              {openSection === 'inventory' && (
-                <div className="ml-4 space-y-1">
-                  <button
-                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/inventory/stock-count')}
-                  >
-                    Stock Count
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/inventory/waste-management')}
-                  >
-                    Waste Management
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/inventory/stock-movement')}
-                  >
-                    Stock Movement
-                  </button>
-                  {isAdmin && (
-                    <button
-                      className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                      onClick={() => navigate('/inventory/inventory-records')}
-                    >
-                      Inventory Records
-                    </button>
-                  )}
-                </div>
-              )}
+             {openSection === 'inventory' && (
+  <div className="ml-4 space-y-1">
+
+    <button
+      className="w-full flex justify-between items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+      onClick={() => setOpenInventoryRestaurantSub(!openInventoryRestaurantSub)}
+    >
+      <span>Restaurant</span>
+      {openInventoryRestaurantSub ? (
+        <ChevronDownIcon className="h-4 w-4" />
+      ) : (
+        <ChevronRightIcon className="h-4 w-4" />
+      )}
+    </button>
+
+    {openInventoryRestaurantSub && (
+      <div className="ml-4 space-y-1">
+        <button
+          className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+          onClick={() => navigate('/inventory/stock-count')}
+        >
+          Restaurant Stock Count
+        </button>
+        <button
+          className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+          onClick={() => navigate('/inventory/waste-management')}
+        >
+         Restaurant Waste Management
+        </button>
+        <button
+          className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+          onClick={() => navigate('/inventory/stock-movement')}
+        >
+          Restaurant Stock Movement
+        </button>
+        {isAdmin && (
+          <button
+            className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+            onClick={() => navigate('/inventory/inventoryrecords')}
+          >
+            Restaurant Inventory Records
+          </button>
+        )}
+      </div>
+    )}
+
+    <button
+      className="w-full flex justify-between items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+      onClick={() => setOpenInventoryKartSub(!openInventoryKartSub)}
+    >
+      <span>Food Cart</span>
+      {openInventoryKartSub ? (
+        <ChevronDownIcon className="h-4 w-4" />
+      ) : (
+        <ChevronRightIcon className="h-4 w-4" />
+      )}
+    </button>
+
+    {openInventoryKartSub && (
+      <div className="ml-4 space-y-1">
+        <button
+          className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+           onClick={() => navigate('/inventory/cart/cartStockCount')}
+        >
+          Cart Stock Count
+        </button>
+        <button
+          className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+          onClick={() => navigate('/inventory/cart/cartWasteManagement')}
+        >
+          Cart Waste Management
+        </button>
+        <button
+          className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+          onClick={() => navigate('/inventory/cart/cartStockMovement')}
+        >
+          Cart Stock Movement
+        </button>
+        {isAdmin && (
+          <button
+            className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+            onClick={() => navigate('/inventory/cart/cartInventoryRecords')}
+          >
+            Cart Inventory Records
+          </button>
+        )}
+      </div>
+    )}
+
+  </div>
+)}
+
             </div>
 
             <div className="space-y-1">
@@ -551,17 +615,74 @@ const Sidebar = () => {
               {openSection === 'itemsmanagement' && (
                 <div className="ml-4 space-y-1">
                   <button
-                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/items-management/restaurant')}
+                    className="w-full flex justify-between items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => setOpenRestaurantSub(!openRestaurantSub)}
                   >
-                    Restaurant
+                    <span>Restaurant</span>
+                    {openRestaurantSub ? (
+                      <ChevronDownIcon className="h-4 w-4" />
+                    ) : (
+                      <ChevronRightIcon className="h-4 w-4" />
+                    )}
                   </button>
+
+                          {openRestaurantSub && (
+                  <div className="ml-4 space-y-1">
+               <button
+                       className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+                       onClick={() => navigate('/items-management/categories')}
+                >
+                        Restaurant Categories
+                </button>
+                <button
+                     className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+                      onClick={() => navigate('/items-management/items')}
+                    >
+               Restaurant Items
+              </button>
+               <button
+             className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+              onClick={() => navigate('/items-management/sauces')}
+              >
+                Restaurant Sauces
+              </button>
+            </div>
+            )}
+
                   <button
-                    className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                    onClick={() => navigate('/items-management/kart')}
+                    className="w-full flex justify-between items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+                    onClick={() => setOpenKartSub(!openKartSub)}
                   >
-                    Kart
+                    <span>Food Cart</span>
+                    {openKartSub ? (
+                      <ChevronDownIcon className="h-4 w-4" />
+                    ) : (
+                      <ChevronRightIcon className="h-4 w-4" />
+                    )}
                   </button>
+
+                  {openKartSub && (
+                    <div className="ml-4 space-y-1">
+                      <button
+                        className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+                        onClick={() => navigate('/items-management/kart/categories')}
+                      >
+                        Cart Categories
+                      </button>
+                      <button
+                        className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+                        onClick={() => navigate('/items-management/kart/items')}
+                      >
+                        Cart Items
+                      </button>
+                      <button
+                        className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
+                        onClick={() => navigate('/items-management/kart/sauces')}
+                      >
+                        Cart Sauces
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -583,21 +704,22 @@ const Sidebar = () => {
             </button>
 
             {openSection === 'customerTracking' && (
-              <div className="ml-4 space-y-1">
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/customer-tracking/reports')}
-                >
-                  Customer Report
-                </button>
-                <button
-                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
-                  onClick={() => navigate('/customer-tracking/kot')}
-                >
-                  KOT Reports
-                </button>
-              </div>
-            )}
+  <div className="ml-4 space-y-1">
+    <button
+      className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+      onClick={() => navigate('/reports/customerreports')}
+    >
+      Customer Report
+    </button>
+    <button
+      className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
+      onClick={() => navigate('/reports/kot')}
+    >
+      KOT Reports
+    </button>
+  </div>
+)}
+
           </div>
         )}
       </nav>

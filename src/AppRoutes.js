@@ -197,6 +197,13 @@ import WasteManagement from '../src/pages/inventory/WasteManagement';
 import InventoryAndWasteHistory from '../src/pages/inventory/StockMovement';
 import InventoryRecords from "./pages/inventory/inventoryrecords";
 import AddInventory from './pages/inventory/Addinventory';
+import CartStockCount from './pages/inventory/cartInventory/cartStockCount';
+import CartWasteManagement from '../src/pages/inventory/cartInventory/cartWasteManagement';
+import CartInventoryAndWasteHistory from '../src/pages/inventory/cartInventory/cartStockMovement';
+import CartInventoryRecords from "./pages/inventory/cartInventory/cartInventoryRecords";
+import CartAddinventory from './pages/inventory/cartInventory/cartAddInventory';
+
+
 
 // Specific to admin 
 import AddUser from "../src/pages/admin/AddUser";
@@ -207,10 +214,11 @@ import ViewDetails from "./pages/teammember/ViewDetails";
 
 // Items Management
 import Categories from "../src/pages/itemsManagement/categories";
-import KartItems from "../src/pages/itemsManagement/kart/KartItems"; // Updated to KartItems.js
-import KartCategories from "../src/pages/itemsManagement/kart/KartCategories"; // Added for kart categories
-import KartSauces from "../src/pages/itemsManagement/kart/KartSauces"; // Added for kart sauces
-import Sauces from "../src/pages/itemsManagement/sauces"; // Keep original Sauces if needed
+import KartItems from "../src/pages/itemsManagement/kart/KartItems";
+import KartCategories from "../src/pages/itemsManagement/kart/KartCategories";
+import KartSauces from "../src/pages/itemsManagement/kart/KartSauces";
+import Sauces from "../src/pages/itemsManagement/sauces";
+import ItemsManager from "../src/pages/itemsManagement/items";
 
 // Cash Management imports
 import OpenCashier from './pages/cashManagement/OpenCashier';
@@ -236,7 +244,6 @@ function AppRoutes() {
       <Route path="/" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Common routes for all authenticated users */}
       <Route element={<ProtectedRoute allowedRoles={[
         ROLES.ADMIN,
         ROLES.MANAGER,
@@ -268,7 +275,6 @@ function AppRoutes() {
         </Route>
       </Route>
 
-      {/* Admin and Manager only routes */}
       <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.TEAMLEADER]} />}>
         <Route element={<Layout />}>
           <Route path="/users" element={<Users />} />
@@ -278,14 +284,12 @@ function AppRoutes() {
         </Route>
       </Route>
 
-      {/* for TeamMember  */}
       <Route element={<ProtectedRoute allowedRoles={[ROLES.TEAMMEMBER]} />}>
         <Route element={<Layout />}>
           <Route path="/viewDetails" element={<ViewDetails />} />
         </Route>
       </Route>
 
-      {/* Inventory routes for Admin, Manager, and Team Leader */}
       <Route element={<ProtectedRoute allowedRoles={[
         ROLES.ADMIN,
         ROLES.MANAGER,
@@ -297,10 +301,14 @@ function AppRoutes() {
           <Route path="/inventory/stock-movement" element={<InventoryAndWasteHistory />} />
           <Route path="/inventory/inventoryrecords" element={<InventoryRecords />} />
           <Route path="/inventory/addinventory" element={<AddInventory />} />
+          <Route path="/inventory/cart/cartStockCount" element={<CartStockCount />} />
+          <Route path="/inventory/cart/cartWasteManagement" element={<CartWasteManagement />} />
+          <Route path="/inventory/cart/cartStockMovement" element={<CartInventoryAndWasteHistory />} />
+          <Route path="/inventory/cart/cartInventoryRecords" element={<CartInventoryRecords />} />
+          <Route path="/inventory/cart/cartAddInventory" element={<CartAddinventory />} />
         </Route>
       </Route>
 
-      {/* Cash Management routes for Admin, Manager, and Team Leader */}
       <Route element={<ProtectedRoute allowedRoles={[
         ROLES.ADMIN,
         ROLES.MANAGER,
@@ -316,23 +324,21 @@ function AppRoutes() {
         </Route>
       </Route>
 
-      {/* Items Management for Admin, Manager, and Team Leader */}
       <Route element={<ProtectedRoute allowedRoles={[
         ROLES.ADMIN,
         ROLES.MANAGER,
         ROLES.TEAMLEADER
       ]} />}>
         <Route element={<Layout />}>
-          <Route path="/itemsmanagement/categories" element={<Categories />} />
-          <Route path="/itemsmanagement/items" element={<KartItems />} /> {/* Replaced ItemsManager with KartItems */}
-          <Route path="/itemsmanagement/kart/categories" element={<KartCategories />} /> {/* Added KartCategories */}
-          <Route path="/itemsmanagement/kart/items" element={<KartItems />} /> {/* Added KartItems route */}
-          <Route path="/itemsmanagement/kart/sauces" element={<KartSauces />} /> {/* Added KartSauces */}
-          <Route path="/itemsmanagement/sauces" element={<Sauces />} /> {/* Keep original Sauces if needed */}
+          <Route path="/items-management/categories" element={<Categories />} />
+          <Route path="/items-management/items" element={<ItemsManager />} />
+          <Route path="/items-management/sauces" element={<Sauces />} />
+          <Route path="/items-management/kart/categories" element={<KartCategories />} />
+          <Route path="/items-management/kart/items" element={<KartItems />} />
+          <Route path="/items-management/kart/sauces" element={<KartSauces />} />
         </Route>
       </Route>
 
-      {/* Reports for Admin, Manager */}
       <Route element={<ProtectedRoute allowedRoles={[
         ROLES.ADMIN,
         ROLES.MANAGER

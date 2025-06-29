@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase/config';
+import { db } from '../../../firebase/config';
 import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
-import InventoryManagement from './InventoryManagement';
+import InventoryManagement from '../InventoryManagement';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-const StockCount = () => {
+const CartStockCount = () => {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [appliedCounts, setAppliedCounts] = useState({});
@@ -22,7 +22,7 @@ const StockCount = () => {
   useEffect(() => {
     const fetchItemsData = async () => {
       try {
-        const snapshot = await getDocs(collection(db, 'inventory'));
+        const snapshot = await getDocs(collection(db, 'inventory_02'));
         const items = await Promise.all(
           snapshot.docs.map(async (docSnap) => {
             const data = docSnap.data();
@@ -142,7 +142,7 @@ const StockCount = () => {
         const variance = totalUnits - item.totalStockOnHand;
 
         if (override) {
-          const inventoryRef = doc(db, 'inventory', item.id);
+          const inventoryRef = doc(db, 'inventory_02', item.id);
           batchWrites.push(
             setDoc(inventoryRef, { totalStockOnHand: totalUnits }, { merge: true })
           );
@@ -435,4 +435,4 @@ const StockCount = () => {
   );
 };
 
-export default StockCount;
+export default CartStockCount;
