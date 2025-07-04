@@ -503,7 +503,7 @@ const Sidebar = () => {
       className="w-full flex justify-between items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
       onClick={() => setOpenInventoryRestaurantSub(!openInventoryRestaurantSub)}
     >
-      <span>Restaurant</span>
+      <span>Bold Street</span>
       {openInventoryRestaurantSub ? (
         <ChevronDownIcon className="h-4 w-4" />
       ) : (
@@ -517,26 +517,26 @@ const Sidebar = () => {
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
           onClick={() => navigate('/inventory/stock-count')}
         >
-          Restaurant Stock Count
+          Bold Street Stock Count
         </button>
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
           onClick={() => navigate('/inventory/waste-management')}
         >
-         Restaurant Waste Management
+         Bold Street Waste Management
         </button>
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
           onClick={() => navigate('/inventory/stock-movement')}
         >
-          Restaurant Stock Movement
+          Bold Street Stock Movement
         </button>
         {isAdmin && (
           <button
             className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
             onClick={() => navigate('/inventory/inventoryrecords')}
           >
-            Restaurant Inventory Records
+            Bold Street Inventory Records
           </button>
         )}
       </div>
@@ -546,7 +546,7 @@ const Sidebar = () => {
       className="w-full flex justify-between items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
       onClick={() => setOpenInventoryKartSub(!openInventoryKartSub)}
     >
-      <span>Food Cart</span>
+      <span>Liverpool One</span>
       {openInventoryKartSub ? (
         <ChevronDownIcon className="h-4 w-4" />
       ) : (
@@ -560,26 +560,26 @@ const Sidebar = () => {
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
            onClick={() => navigate('/inventory/cart/cartStockCount')}
         >
-          Cart Stock Count
+          Liverpool One Stock Count
         </button>
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
           onClick={() => navigate('/inventory/cart/cartWasteManagement')}
         >
-          Cart Waste Management
+          Liverpool One Waste Management
         </button>
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
           onClick={() => navigate('/inventory/cart/cartStockMovement')}
         >
-          Cart Stock Movement
+          Liverpool One Stock Movement
         </button>
         {isAdmin && (
           <button
             className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
             onClick={() => navigate('/inventory/cart/cartInventoryRecords')}
           >
-            Cart Inventory Records
+            Liverpool One Inventory Records
           </button>
         )}
       </div>
@@ -652,7 +652,7 @@ const Sidebar = () => {
                     className="w-full flex justify-between items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                     onClick={() => setOpenRestaurantSub(!openRestaurantSub)}
                   >
-                    <span>Restaurant</span>
+                    <span>Bold Street</span>
                     {openRestaurantSub ? (
                       <ChevronDownIcon className="h-4 w-4" />
                     ) : (
@@ -666,19 +666,19 @@ const Sidebar = () => {
                        className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
                        onClick={() => navigate('/items-management/categories')}
                 >
-                        Restaurant Categories
+                        Bold Street Categories
                 </button>
                 <button
                      className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
                       onClick={() => navigate('/items-management/items')}
                     >
-               Restaurant Items
+               Bold Street Items
               </button>
                <button
              className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
               onClick={() => navigate('/items-management/sauces')}
               >
-                Restaurant Sauces
+                Bold Street Sauces
               </button>
             </div>
             )}
@@ -687,7 +687,7 @@ const Sidebar = () => {
                     className="w-full flex justify-between items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                     onClick={() => setOpenKartSub(!openKartSub)}
                   >
-                    <span>Food Cart</span>
+                    <span>Liverpool One</span>
                     {openKartSub ? (
                       <ChevronDownIcon className="h-4 w-4" />
                     ) : (
@@ -701,19 +701,19 @@ const Sidebar = () => {
                         className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
                         onClick={() => navigate('/items-management/kart/categories')}
                       >
-                        Cart Categories
+                        Liverpool One Categories
                       </button>
                       <button
                         className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
                         onClick={() => navigate('/items-management/kart/items')}
                       >
-                        Cart Items
+                        Liverpool One Items
                       </button>
                       <button
                         className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
                         onClick={() => navigate('/items-management/kart/sauces')}
                       >
-                        Cart Sauces
+                        Liverpool One Sauces
                       </button>
                     </div>
                   )}
