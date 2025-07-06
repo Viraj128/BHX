@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase/config';
+import { db } from '../../../firebase/config';
 import { collection, getDocs, setDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import WasteLogHistory from './WasteLogHistory';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
@@ -231,7 +231,7 @@ const WasteManagement = () => {
 
   return (
     <div className="flex-1 p-6 overflow-auto">
-      <h1 className="text-2xl font-bold mb-6">Waste Management</h1>
+      <h1 className="text-2xl font-bold mb-6">Restuarant(Bold Street) Waste Management</h1>
 
       <div className="mb-4 flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">

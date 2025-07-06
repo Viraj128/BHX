@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../../firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
+
+
 import {
   FaClock,
   FaSun,
@@ -29,7 +31,7 @@ const CartWasteLogHistory = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const logsSnapshot = await getDocs(collection(db, 'wasteLogs'));
+        const logsSnapshot = await getDocs(collection(db, 'wasteLogs_02'));
         const logsData = await Promise.all(
           logsSnapshot.docs.map(async (doc) => {
             const data = doc.data();
@@ -112,7 +114,7 @@ const CartWasteLogHistory = () => {
     setExpandedLogId(logId);
 
     try {
-      const wasteItemsRef = collection(db, `wasteLogs/${logId}/wasteItems`);
+      const wasteItemsRef = collection(db, `wasteLogs_02/${logId}/wasteItems`);
       const itemsSnapshot = await getDocs(wasteItemsRef);
 
       const itemsData = itemsSnapshot.docs.map((itemDoc) => {
@@ -213,7 +215,7 @@ const CartWasteLogHistory = () => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3">
         <FaCalendarAlt className="text-blue-500 text-xl" />
-        Waste Log History
+        Cart(Liverpool One) Waste Log History
       </h1>
 
       {/* Filter Section */}

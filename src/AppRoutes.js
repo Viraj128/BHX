@@ -200,16 +200,18 @@ import Attendance from '../src/pages/Attendance';
 import UserDetails from '../src/pages/UserDetails';
 import MemberAttendance from './pages/MemberAttendance';
 
-// Inventory 
-import StockCount from './pages/inventory/StockCount';
-import WasteManagement from '../src/pages/inventory/WasteManagement';
-import InventoryAndWasteHistory from '../src/pages/inventory/StockMovement';
-import InventoryRecords from "./pages/inventory/inventoryrecords";
-import AddInventory from './pages/inventory/Addinventory';
+// Main Inventory
+import StockCount from './pages/inventory/mainInventory/StockCount';
+import WasteManagement from './pages/inventory/mainInventory/WasteManagement';
+import InventoryAndWasteHistory from './pages/inventory/mainInventory/StockMovement';
+import InventoryRecords from './pages/inventory/mainInventory/inventoryrecords';
+import AddInventory from './pages/inventory/mainInventory/Addinventory';
+
+// Cart Inventory
 import CartStockCount from './pages/inventory/cartInventory/cartStockCount';
-import CartWasteManagement from '../src/pages/inventory/cartInventory/cartWasteManagement';
-import CartInventoryAndWasteHistory from '../src/pages/inventory/cartInventory/cartStockMovement';
-import CartInventoryRecords from "./pages/inventory/cartInventory/cartInventoryRecords";
+import CartWasteManagement from './pages/inventory/cartInventory/cartWasteManagement';
+import CartInventoryAndWasteHistory from './pages/inventory/cartInventory/cartStockMovement';
+import CartInventoryRecords from './pages/inventory/cartInventory/cartInventoryRecords';
 import CartAddinventory from './pages/inventory/cartInventory/cartAddInventory';
 
 
@@ -222,12 +224,12 @@ import ChangePhoneNumber from "../src/pages/admin/phoneNumberChange"
 import ViewDetails from "./pages/teammember/ViewDetails";
 
 // Items Management
-import Categories from "../src/pages/itemsManagement/categories";
+import Categories from "../src/pages/itemsManagement/mainItems/categories";
 import KartItems from "../src/pages/itemsManagement/kart/KartItems";
 import KartCategories from "../src/pages/itemsManagement/kart/KartCategories";
 import KartSauces from "../src/pages/itemsManagement/kart/KartSauces";
-import Sauces from "../src/pages/itemsManagement/sauces";
-import ItemsManager from "../src/pages/itemsManagement/items";
+import Sauces from "../src/pages/itemsManagement/mainItems/sauces";
+import ItemsManager from "../src/pages/itemsManagement/mainItems/items";
 
 // Cash Management imports
 import OpenCashier from './pages/cashManagement/OpenCashier';
@@ -309,16 +311,16 @@ function AppRoutes() {
         ROLES.TEAMLEADER
       ]} />}>
         <Route element={<Layout />}>
-          <Route path="/inventory/stock-count" element={<StockCount />} />
-          <Route path="/inventory/waste-management" element={<WasteManagement />} />
-          <Route path="/inventory/stock-movement" element={<InventoryAndWasteHistory />} />
-          <Route path="/inventory/inventoryrecords" element={<InventoryRecords />} />
-          <Route path="/inventory/addinventory" element={<AddInventory />} />
-          <Route path="/inventory/cart/cartStockCount" element={<CartStockCount />} />
-          <Route path="/inventory/cart/cartWasteManagement" element={<CartWasteManagement />} />
-          <Route path="/inventory/cart/cartStockMovement" element={<CartInventoryAndWasteHistory />} />
-          <Route path="/inventory/cart/cartInventoryRecords" element={<CartInventoryRecords />} />
-          <Route path="/inventory/cart/cartAddInventory" element={<CartAddinventory />} />
+          <Route path="/inventory/mainInventory/stock-count" element={<StockCount />} />
+          <Route path="/inventory/mainInventory/waste-management" element={<WasteManagement />} />
+          <Route path="/inventory/mainInventory/stock-movement" element={<InventoryAndWasteHistory />} />
+          <Route path="/inventory/mainInventory/inventoryrecords" element={<InventoryRecords />} />
+          <Route path="/inventory/mainInventory/addinventory" element={<AddInventory />} />
+          <Route path="/inventory/cartInventory/cartStockCount" element={<CartStockCount />} />
+          <Route path="/inventory/cartInventory/cartWasteManagement" element={<CartWasteManagement />} />
+          <Route path="/inventory/cartInventory/cartStockMovement" element={<CartInventoryAndWasteHistory />} />
+          <Route path="/inventory/cartInventory/cartInventoryRecords" element={<CartInventoryRecords />} />
+          <Route path="/inventory/cartInventory/cartAddInventory" element={<CartAddinventory />} />
         </Route>
       </Route>
 
@@ -343,9 +345,9 @@ function AppRoutes() {
         ROLES.TEAMLEADER
       ]} />}>
         <Route element={<Layout />}>
-          <Route path="/items-management/categories" element={<Categories />} />
-          <Route path="/items-management/items" element={<ItemsManager />} />
-          <Route path="/items-management/sauces" element={<Sauces />} />
+          <Route path="/items-management/mainItems/categories" element={<Categories />} />
+          <Route path="/items-management/mainItems/items" element={<ItemsManager />} />
+          <Route path="/items-management/mainItems/sauces" element={<Sauces />} />
           <Route path="/items-management/kart/categories" element={<KartCategories />} />
           <Route path="/items-management/kart/items" element={<KartItems />} />
           <Route path="/items-management/kart/sauces" element={<KartSauces />} />

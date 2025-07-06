@@ -205,9 +205,9 @@ const KartCategories = () => {
         <div className="p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Kart Category Management</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Cart(Liverpool One) Category Management</h1>
               <p className="text-gray-600 mt-1">
-                Manage your kart product categories and organization
+                Manage your Cart product categories and organization
               </p>
             </div>
             <div className="mt-4 md:mt-0">

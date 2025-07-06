@@ -41,11 +41,11 @@ const CartStockCountLog = () => {
     const fetchLogs = async () => {
       try {
         setLoading(true);
-        const logsSnapshot = await getDocs(collection(db, 'inventoryLog'));
+        const logsSnapshot = await getDocs(collection(db, 'inventoryLog_02'));
 
         const logPromises = logsSnapshot.docs.map(async (doc) => {
           const logData = doc.data();
-          const itemsRef = collection(db, `inventoryLog/${doc.id}/items`);
+          const itemsRef = collection(db, `inventoryLog_02/${doc.id}/items`);
           const itemsSnapshot = await getDocs(itemsRef);
 
           return {

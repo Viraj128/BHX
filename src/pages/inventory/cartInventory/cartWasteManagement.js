@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../../firebase/config';
 import { collection, getDocs, setDoc, doc, updateDoc, increment } from 'firebase/firestore';
-import WasteLogHistory from '../WasteLogHistory';  
+import CartWasteLogHistory from './cartWasteLogHistory';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
@@ -132,7 +132,7 @@ const CartWasteManagement = () => {
 
     try {
       // Create waste log document
-      const wasteLogRef = doc(db, 'wasteLogs', logId);
+      const wasteLogRef = doc(db, 'wasteLogs_02', logId);
       const totalWaste = itemsToAdjust.reduce((sum, item) => sum + calculateWaste(item), 0);
 
       await setDoc(wasteLogRef, {
@@ -150,7 +150,7 @@ const CartWasteManagement = () => {
       itemsToAdjust.forEach(item => {
         const totalWaste = calculateWaste(item);
         const wasteItemId = `${logId}_${item.id}`;
-        const wasteItemRef = doc(db, `wasteLogs/${logId}/wasteItems`, wasteItemId);
+        const wasteItemRef = doc(db, `wasteLogs_02/${logId}/wasteItems`, wasteItemId);
 
         // Add waste item record
         wasteItemPromises.push(setDoc(wasteItemRef, {
@@ -224,14 +224,14 @@ const CartWasteManagement = () => {
         >
           Back to Waste Management
         </button>
-        <WasteLogHistory />
+        <CartWasteLogHistory />
       </div>
     );
   }
 
   return (
     <div className="flex-1 p-6 overflow-auto">
-      <h1 className="text-2xl font-bold mb-6">Waste Management</h1>
+      <h1 className="text-2xl font-bold mb-6">Cart(Liverpool One) Waste Management</h1>
 
       <div className="mb-4 flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">

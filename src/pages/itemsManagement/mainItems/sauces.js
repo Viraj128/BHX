@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../../firebase/config';
+import { db } from '../../../firebase/config';
 import { collection, onSnapshot, setDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { useAuth } from '../../auth/AuthContext';
-import { ROLES } from '../../config/roles';
+import { useAuth } from '../../../auth/AuthContext';
+import { ROLES } from '../../../config/roles';
 import { FiEdit, FiTrash2, FiPlus, FiSearch, FiX, FiToggleLeft, FiToggleRight } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
@@ -165,7 +165,7 @@ const Sauces = () => {
         <div className="p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Sauce Group Management</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Restuarant(Bold Street) Sauce Group Management</h1>
               <p className="text-gray-600 mt-1">
                 Manage your sauce groups and organization
               </p>

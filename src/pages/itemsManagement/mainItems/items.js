@@ -8,9 +8,9 @@ import {
   deleteDoc,
   setDoc,
 } from 'firebase/firestore';
-import { db } from '../../firebase/config';
-import { useAuth } from '../../auth/AuthContext';
-import { ROLES } from '../../config/roles';
+import { db } from '../../../firebase/config';
+import { useAuth } from '../../../auth/AuthContext';
+import { ROLES } from '../../../config/roles';
 import { FiEdit, FiTrash2, FiToggleLeft, FiToggleRight, FiPlus, FiSearch, FiX } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
@@ -234,7 +234,7 @@ const ItemsManager = () => {
         <div className="p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Item Management</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Restuarant(Bold Street) Item Management</h1>
               <p className="text-gray-600 mt-1">Manage your items and organization</p>
             </div>
             <div className="mt-4 md:mt-0">

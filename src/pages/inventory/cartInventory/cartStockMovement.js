@@ -39,11 +39,11 @@ const CartInventoryAndWasteHistory = () => {
 
   // Helper to fetch inventory logs
   const fetchInventoryLogs = useCallback(async () => {
-    const inventorySnapshot = await getDocs(collection(db, 'inventoryLog'));
+    const inventorySnapshot = await getDocs(collection(db, 'inventoryLog_02'));
     return Promise.all(
       inventorySnapshot.docs.map(async (doc) => {
         const data = doc.data();
-        const itemsRef = collection(db, `inventoryLog/${doc.id}/items`);
+        const itemsRef = collection(db, `inventoryLog_02/${doc.id}/items`);
         const itemsSnapshot = await getDocs(itemsRef);
 
         const itemsData = itemsSnapshot.docs.map((itemDoc) => ({
@@ -75,11 +75,11 @@ const CartInventoryAndWasteHistory = () => {
 
   // Helper to fetch waste logs
   const fetchWasteLogs = useCallback(async () => {
-    const wasteSnapshot = await getDocs(collection(db, 'wasteLogs'));
+    const wasteSnapshot = await getDocs(collection(db, 'wasteLogs_02'));
     return Promise.all(
       wasteSnapshot.docs.map(async (doc) => {
         const data = doc.data();
-        const wasteItemsRef = collection(db, `wasteLogs/${doc.id}/wasteItems`);
+        const wasteItemsRef = collection(db, `wasteLogs_02/${doc.id}/wasteItems`);
         const itemsSnapshot = await getDocs(wasteItemsRef);
 
         const itemsData = itemsSnapshot.docs.map((itemDoc) => {
@@ -339,7 +339,7 @@ const CartInventoryAndWasteHistory = () => {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Filters */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Inventory & Waste History</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Cart(Liverpool One) Inventory & Waste History</h1>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <div className="flex gap-2">
             <input
@@ -487,7 +487,7 @@ const CartInventoryAndWasteHistory = () => {
                       )
                       .length > 0 && (
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-800 mb-4">Stock Count Log: -</h4>
+                        <h4 className="text-lg font-semibold text-gray-800 mb-4">Cart(Liverpool One) Stock Count Log: -</h4>
                         {dateGroup.inventoryLogs
                           .filter((log) =>
                             selectedTime === 'all' ||

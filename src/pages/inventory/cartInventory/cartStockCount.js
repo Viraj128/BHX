@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../../firebase/config';
 import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
-import InventoryManagement from '../InventoryManagement';
+import CartInventoryManagement from './cartInventoryManagement';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
@@ -118,7 +118,7 @@ const CartStockCount = () => {
 
     try {
       // Use formatted date and time as document ID
-      const varianceLogRef = doc(db, 'inventoryLog', docId);
+      const varianceLogRef = doc(db, 'inventoryLog_02', docId);
 
       // Calculate total variance for items with non-zero variance
       const totalVariance = itemsWithVariance.reduce((sum, item) => {
@@ -276,14 +276,14 @@ const CartStockCount = () => {
         >
           Back to Stock Count
         </button>
-        <InventoryManagement />
+        <CartInventoryManagement />
       </div>
     );
   }
 
   return (
     <div className="flex-1 p-6 overflow-auto">
-      <h1 className="text-2xl font-bold mb-6">Inventory Management (Stock Count)</h1>
+      <h1 className="text-2xl font-bold mb-6"> Cart(Liverpool One) Inventory Management (Stock Count)</h1>
 
       <div className="mb-4 flex flex-wrap items-center gap-4">
         <input
@@ -407,7 +407,7 @@ const CartStockCount = () => {
       {showVarianceModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">Inventory Adjustment Required</h3>
+            <h3 className="text-lg font-bold mb-4">  Inventory Adjustment Required</h3>
             <p className="mb-4">
               There is a variance in {pendingVarianceItems.length} item(s).
             </p>

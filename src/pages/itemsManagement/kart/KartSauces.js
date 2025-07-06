@@ -165,7 +165,7 @@ const KartSauces = () => {
         <div className="p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Kart Sauce Group Management</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Cart(Liverpool One) Sauce Group Management</h1>
               <p className="text-gray-600 mt-1">
                 Manage your kart sauce groups and organization
               </p>

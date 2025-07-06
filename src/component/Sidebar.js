@@ -515,26 +515,26 @@ const Sidebar = () => {
       <div className="ml-4 space-y-1">
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-          onClick={() => navigate('/inventory/stock-count')}
+          onClick={() => navigate('/inventory/mainInventory/stock-count')}
         >
           Bold Street Stock Count
         </button>
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-          onClick={() => navigate('/inventory/waste-management')}
+          onClick={() => navigate('/inventory/mainInventory/waste-management')}
         >
          Bold Street Waste Management
         </button>
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-          onClick={() => navigate('/inventory/stock-movement')}
+          onClick={() => navigate('/inventory/mainInventory/stock-movement')}
         >
           Bold Street Stock Movement
         </button>
         {isAdmin && (
           <button
             className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-            onClick={() => navigate('/inventory/inventoryrecords')}
+            onClick={() => navigate('/inventory/mainInventory/inventoryrecords')}
           >
             Bold Street Inventory Records
           </button>
@@ -558,26 +558,26 @@ const Sidebar = () => {
       <div className="ml-4 space-y-1">
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-           onClick={() => navigate('/inventory/cart/cartStockCount')}
+           onClick={() => navigate('/inventory/cartInventory/cartStockCount')}
         >
           Liverpool One Stock Count
         </button>
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-          onClick={() => navigate('/inventory/cart/cartWasteManagement')}
+          onClick={() => navigate('/inventory/cartInventory/cartWasteManagement')}
         >
           Liverpool One Waste Management
         </button>
         <button
           className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-          onClick={() => navigate('/inventory/cart/cartStockMovement')}
+          onClick={() => navigate('/inventory/cartInventory/cartStockMovement')}
         >
           Liverpool One Stock Movement
         </button>
         {isAdmin && (
           <button
             className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-            onClick={() => navigate('/inventory/cart/cartInventoryRecords')}
+            onClick={() => navigate('/inventory/cartInventory/cartInventoryRecords')}
           >
             Liverpool One Inventory Records
           </button>
@@ -664,19 +664,19 @@ const Sidebar = () => {
                   <div className="ml-4 space-y-1">
                <button
                        className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-                       onClick={() => navigate('/items-management/categories')}
+                       onClick={() => navigate('/items-management/mainItems/categories')}
                 >
-                        Bold Street Categories
+                 Bold Street Categories
                 </button>
                 <button
                      className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-                      onClick={() => navigate('/items-management/items')}
+                      onClick={() => navigate('/items-management/mainItems/items')}
                     >
                Bold Street Items
               </button>
                <button
              className="w-full text-left px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md text-sm"
-              onClick={() => navigate('/items-management/sauces')}
+              onClick={() => navigate('/items-management/mainItems/sauces')}
               >
                 Bold Street Sauces
               </button>
@@ -777,13 +777,13 @@ const Sidebar = () => {
                   className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                   onClick={() => navigate('/haccaplog/ShopCarthaccap')}
                 >
-                  HACCAP Shop Cart Report
+                  HACCAP Shop (Bold Street) Report
                 </button>
                 <button
                   className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm"
                   onClick={() => navigate( '/haccaplog/foodCarthaccap')}
                 >
-                  HACCAP Food Cart Report
+                  HACCAP Food Cart (Liverpool) Report
                 </button>
               </div>
             )}

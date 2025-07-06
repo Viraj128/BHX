@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { collection, getDocs, doc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../auth/AuthContext';
-import { ROLES } from '../../../config/roles';
-
+import { useAuth } from '../../../auth/AuthContext'; // Import useAuth
+import { ROLES } from '../../../config/roles'; // Import ROLES
 
 const CartInventoryRecords = () => {
   const { user } = useAuth(); // Get current user from AuthContext
@@ -248,7 +247,7 @@ const CartInventoryRecords = () => {
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 bg-white p-6 rounded-lg shadow">
           {isAdmin && (
             <button
-              onClick={() => navigate('/inventory/cartAddinventory')}
+              onClick={() => navigate('/inventory/cartInventory/cartAddInventory')}
               className="bg-emerald-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-emerald-700 transition duration-300 flex items-center mb-4 md:mb-0"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -258,7 +257,7 @@ const CartInventoryRecords = () => {
             </button>
           )}
           
-          <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Inventory Records</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Cart(Liverpool One) Inventory Records</h1>
           
           <div className="relative w-full md:w-auto">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

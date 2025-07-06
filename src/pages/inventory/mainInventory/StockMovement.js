@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { db } from '../../firebase/config';
+import { db } from '../../../firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
 import {
   FaSun,
@@ -339,7 +339,7 @@ const InventoryAndWasteHistory = () => {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Filters */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Inventory & Waste History</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Restuarant(Bold Street) Inventory & Waste History</h1>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <div className="flex gap-2">
             <input
@@ -487,7 +487,7 @@ const InventoryAndWasteHistory = () => {
                       )
                       .length > 0 && (
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-800 mb-4">Stock Count Log: -</h4>
+                        <h4 className="text-lg font-semibold text-gray-800 mb-4">Restuarant(Bold Street) Stock Count Log: -</h4>
                         {dateGroup.inventoryLogs
                           .filter((log) =>
                             selectedTime === 'all' ||

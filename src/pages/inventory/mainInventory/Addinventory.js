@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../../firebase/config';
+import { db } from '../../../firebase/config';
 import { collection, doc, setDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import Skeleton from 'react-loading-skeleton';
 
@@ -147,7 +147,7 @@ const Addinventory = () => {
       setStockOnHand(0);
 
       setTimeout(() => {
-        navigate('/inventory/inventoryrecords');
+        navigate('/inventory/mainInventory/inventoryrecords');
       }, 1500);
     } catch (err) {
       console.error('Error adding inventory:', err);
@@ -184,9 +184,9 @@ const Addinventory = () => {
     <div className="max-w-xl mx-auto mt-8 md:mt-16 p-6 md:p-8 bg-white border border-gray-200 rounded-2xl shadow-xl">
       <button
         className="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-green-700 transition-colors mb-6"
-        onClick={() => navigate("/inventory/inventoryrecords")}
+        onClick={() => navigate("/inventory/mainInventory/inventoryrecords")}
       >
-        Back to Users
+        Back to Records
       </button>
       <div className="mb-6 text-center">
         <h2 className="text-2xl font-bold text-gray-800">Add New Inventory</h2>
